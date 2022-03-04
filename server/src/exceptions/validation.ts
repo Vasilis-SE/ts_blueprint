@@ -49,20 +49,6 @@ export class ExcessiveBodyProperties implements IException {
     }
 }
 
-export class InvalidEmail implements IException {
-    public status: boolean;
-    public message: string;
-    public errorCode: string;
-    public httpCode: number;
-
-    constructor(message?: string) {
-        this.status = false;
-        this.message = message ? message : 'It seems the email you have provided is not a valid one...';
-        this.errorCode = 'ev4';
-        this.httpCode = HttpCodes.BAD_REQUEST;
-    }
-}
-
 export class ContainsInvalidChars implements IException {
     public status: boolean;
     public message: string;

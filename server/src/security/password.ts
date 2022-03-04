@@ -30,7 +30,7 @@ export default class Password {
         return this.password.length >= UserGlobals.PASSWORD_MINLENGTH;
     }
 
-    isPasswordStrong() {
+    async isPasswordStrong() {
         let points = 0;
 
         if (Validator.hasLowerCase(this.password)) points++;

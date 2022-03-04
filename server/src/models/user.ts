@@ -3,6 +3,11 @@ import ObjectHandler from '../helpers/objectHandler';
 import { IListOfUsers, IUser, IUserFilters, IUserProperties } from '../interfaces/user';
 
 export default class UserModel implements IUser {
+    id!: number;
+    username!: string;
+    password!: string;
+    created_at!: number;
+
     constructor(user: IUserProperties = {}) {
         this._setProperties(user);
     }
@@ -32,28 +37,43 @@ export default class UserModel implements IUser {
         }
     }
 
+    async createUser(): Promise<boolean> {
+        try {
+            const query = await PostgreSQL.client.query(`INSERT INTO users (username, password, created_at) 
+                VALUES ('${this.getUsername()}', '${this.getPassword()}', ${this.getCreatedAtStamp()})
+                RETURNING id`);
+            if (query.rowCount === 0) throw Error();
+
+            // Set the newly created id
+            this.setId(query.rows[0].id);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     getId(): number {
-        throw new Error('Method not implemented.');
+        return this.id;
     }
     getUsername(): string {
-        throw new Error('Method not implemented.');
+        return this.username;
     }
     getPassword(): string {
-        throw new Error('Method not implemented.');
+        return this.password;
     }
     getCreatedAtStamp(): number {
-        throw new Error('Method not implemented.');
+        return this.created_at;
     }
-    setId(id?: number): void {
-        throw new Error('Method not implemented.');
+    setId(id: number): void {
+        this.id = id;
     }
-    setUsername(usr?: string): void {
-        throw new Error('Method not implemented.');
+    setUsername(usr: string): void {
+        this.username = usr;
     }
-    setPassword(pass?: string): void {
-        throw new Error('Method not implemented.');
+    setPassword(pass: string): void {
+        this.password = pass;
     }
-    setCreatedAtStamp(ca?: number): void {
-        throw new Error('Method not implemented.');
+    setCreatedAtStamp(ca: number): void {
+        this.created_at = ca;
     }
 }
