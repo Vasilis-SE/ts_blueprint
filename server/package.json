@@ -6,7 +6,10 @@
   "scripts": {
     "api:dev": "nodemon --exec ts-node ./src/bin/index.ts --env=dev",
     "api:prod": "node ./dist/bin/index.js --env=prod",
-    "test": "jest --watchAll --no-cache"
+    "docker:up:prod": "docker-compose --env-file ./src/config/.env up",
+    "docker:build:prod": "docker-compose --env-file ./src/config/.env build",
+    "docker:up:dev": "docker-compose --env-file ./src/config/.env.dev up",
+    "docker:build:dev": "docker-compose --env-file ./src/config/.env.dev build"
   },
   "author": "",
   "license": "ISC",
