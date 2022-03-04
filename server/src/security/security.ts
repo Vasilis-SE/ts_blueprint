@@ -12,23 +12,24 @@ export default class Security {
     }
 
     initializeJWTStrategy() {
-        passport.use(
-            new JwtStrategy(
-                {
-                    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
-                    secretOrKey: process.env.JWT_TOP_SECRET,
-                    ignoreExpiration: false,
-                },
-                async (jwtPayload: JwtPayload, done: any) => {
-                    try {
-                        const userid = jwtPayload.id;
+        // This check is done mainly for ts compiler undefined error.
+        if(!process.env.JWT_TOP_SECRET) 
+            return false;
 
-                        done(null);
-                    } catch (err) {
-                        done(err);
-                    }
-                },
-            ),
+        passport.use(
+            new JwtStrategy({
+                jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
+                secretOrKey: process.env.JWT_TOP_SECRET,
+                ignoreExpiration: false,
+            }, async (jwtPayload: JwtPayload, done: any) => {
+                try {
+                    const userid = jwtPayload.id;
+
+                    done(null);
+                } catch (err) {
+                    done(err);
+                }
+            },),
         );
     }
 

@@ -37,5 +37,4 @@ userRoutes.post(
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 
-
 export default userRoutes;

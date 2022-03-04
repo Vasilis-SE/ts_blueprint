@@ -25,7 +25,7 @@ export default class UserModel implements IUser {
             let results: IListOfUsers = [];
 
             const query = await PostgreSQL.client.query(`SELECT 
-                ${filters.fields ? filters.fields.join(', ') : '*' }
+                ${filters.fields ? filters.fields.join(', ') : '*'}
                 FROM users 
                 ${wherePart ? `WHERE ${wherePart}` : ''}
                 ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}
