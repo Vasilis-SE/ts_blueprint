@@ -5,6 +5,7 @@ import {
     ExcessiveBodyProperties,
     InputExceedMaxLimit,
     InvalidParameterType,
+    InvalidPassword,
     InvalidPropertyType,
     PasswordIsWeak,
     PropertyIsMissing,
@@ -105,6 +106,57 @@ export default class UserService {
             return response;
         } catch (e) {
             if (!(e instanceof CouldNotFindUser)) throw e;
+
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
+
+    async loginUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            if (Object.keys(payload).length > 2) 
+                throw new ExcessiveBodyProperties();
+
+            // Check if any is missing
+            if (!('username' in payload) || !payload.username) 
+                throw new PropertyIsMissing('', 'username');
+            if (!('password' in payload) || !payload.password) 
+                throw new PropertyIsMissing('', 'password');
+
+            // Check data types
+            if (typeof payload.username !== 'string') 
+                throw new InvalidPropertyType('', 'string', 'email');
+            if (typeof payload.password !== 'string') 
+                throw new InvalidPropertyType('', 'string', 'password');
+
+            // Create instance of model and search for user based on the username
+            const _model = new UserModel();
+            _model.setUsername(payload.username);
+            const filters: IRequestQueryFilters = { limit: 1 };
+            const foundUserResults: any = await _model.getUsers(this._getUserFilters(filters));
+            if (!foundUserResults) throw new CouldNotFindUser();
+            
+            _model.setId(foundUserResults[0].id);
+
+            // Set hashed password and compare it with the plain password.
+            const _password = new Password(foundUserResults[0].password);
+            if (!(await _password.comparePassword(payload.password))) 
+                throw new InvalidPassword();
+
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK,
+                data: {id: foundUserResults[0].id},
+            }; 
+            return response;
+        } catch (e) {
+            if (
+                !(e instanceof ExcessiveBodyProperties) &&
+                !(e instanceof PropertyIsMissing) &&
+                !(e instanceof InvalidPropertyType) &&
+                !(e instanceof CouldNotFindUser)
+            ) throw e;
 
             const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
             const error: IFailedResponse = errorResource;

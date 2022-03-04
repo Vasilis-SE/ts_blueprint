@@ -30,4 +30,10 @@ export default class UserController {
         next();
     }
 
+    async loginUser(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+        const payload: IUserProperties = req.body;
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.loginUser(payload);
+        res.response = response;
+        next();
+    }
 }
