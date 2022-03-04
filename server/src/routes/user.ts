@@ -13,4 +13,18 @@ userRoutes.post(
     (req: any, res: any, next: NextFunction) => _baseController.send(req, res, next),
 );
 
+// Route that fetches a user by its id
+userRoutes.get(
+    '/:id(\\d+)',
+    (req: any, res: any, next: NextFunction) => _controller.getUsers(req, res, next),
+    (req: any, res: any, next: NextFunction) => _baseController.send(req, res, next),
+);
+
+// Route that fetches a user by he's username
+userRoutes.get(
+    '/:username',
+    (req: any, res: any, next: NextFunction) => _controller.getUsers(req, res, next),
+    (req: any, res: any, next: NextFunction) => _baseController.send(req, res, next),
+);
+
 export default userRoutes;

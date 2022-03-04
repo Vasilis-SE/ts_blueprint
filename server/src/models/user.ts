@@ -24,7 +24,9 @@ export default class UserModel implements IUser {
             const wherePart = ObjectHandler.objectToSQLParams(ObjectHandler.getResource(this), ' AND ');
             let results: IListOfUsers = [];
 
-            const query = await PostgreSQL.client.query(`SELECT * FROM users 
+            const query = await PostgreSQL.client.query(`SELECT 
+                ${filters.fields ? filters.fields.join(', ') : '*' }
+                FROM users 
                 ${wherePart ? `WHERE ${wherePart}` : ''}
                 ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}
                 ${'limit' in filters ? `LIMIT ${filters.limit}` : ''}`);

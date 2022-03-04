@@ -3,7 +3,6 @@ import { InjectedRequest, InjectedResponse } from '../interfaces/express';
 import { IFailedResponse, ISuccessfulResponse } from '../interfaces/response';
 import { IUserProperties } from '../interfaces/user';
 import UserService from '../services/user';
-// import UserService from '../services/user';
 
 /**
  * Controller class for 'user' domain. All those class functions are connected
@@ -22,4 +21,13 @@ export default class UserController {
         res.response = response;
         next();
     }
+
+    async getUsers(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+        const query: any = req.query;
+        const params: any = req.params;
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.getUsers(params, query);
+        res.response = response;
+        next();
+    }
+
 }

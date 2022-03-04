@@ -26,8 +26,9 @@ export enum UserGlobals {
 }
 
 export interface IUserFilters {
-    orderby?: string;
-    limit?: string;
+    fields?: Array<string>; // Fields are used on queries to fetch specific fields
+    orderby?: string; // Order by for the query
+    limit?: string; // Limit for the query
 }
 
 export type IListOfUsers = Array<IUserProperties>;

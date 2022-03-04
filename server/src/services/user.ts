@@ -1,9 +1,10 @@
 import { FailedToRenderHash } from '../exceptions/security';
-import { UserAlreadyExists, UserCreationFailed } from '../exceptions/user';
+import { CouldNotFindUser, UserAlreadyExists, UserCreationFailed } from '../exceptions/user';
 import {
     ContainsInvalidChars,
     ExcessiveBodyProperties,
     InputExceedMaxLimit,
+    InvalidParameterType,
     InvalidPropertyType,
     PasswordIsWeak,
     PropertyIsMissing,
@@ -11,8 +12,9 @@ import {
 import { HttpCodes } from '../helpers/httpCodesEnum';
 import ObjectHandler from '../helpers/objectHandler';
 import Validator from '../helpers/validator';
+import { IRequestQueryFilters } from '../interfaces/express';
 import { IFailedResponse, ISuccessfulResponse } from '../interfaces/response';
-import { IListOfUsers, IUserProperties, UserGlobals } from '../interfaces/user';
+import { IListOfUsers, IUserFilters, IUserProperties, UserGlobals } from '../interfaces/user';
 import UserModel from '../models/user';
 import Password from '../security/password';
 
@@ -81,5 +83,66 @@ export default class UserService {
             const error: IFailedResponse = errorResource;
             return error;
         }
+    }
+
+    async getUsers(
+        user: IUserProperties,
+        filters: IRequestQueryFilters,
+    ): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            const finalFilters: IUserFilters = await this._getUserFilters(filters);
+            const _model = new UserModel(user);
+
+            finalFilters.fields = ['id','username'];
+            const results: any = await _model.getUsers(finalFilters);
+            if (!results) throw new CouldNotFindUser();
+
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK,
+                data: ObjectHandler.getResource(results),
+            };
+            return response;
+        } catch (e) {
+            if (!(e instanceof CouldNotFindUser)) throw e;
+
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
+
+
+    /**
+     * Protected class function of UserService that is used to clear and gather all the
+     * filter data needed. Filters are used for managing queries on database. For example
+     * ordering a query, calculating the 'chunk' of data to return for pagination etc.
+     * @param filters Object of IRequestQueryFilters interface that contains the filters.
+     * @returns Object of IUserFilters interface which contains the final filters a query will use.
+     */
+    protected _getUserFilters(filters: IRequestQueryFilters): IUserFilters {
+        const final: IUserFilters = {};
+
+        // Set order by filter
+        final.orderby = `${UserGlobals.QUERY_ORDER_FIELD} ${UserGlobals.QUERY_SORT_METHOD}`;
+        if ('order' in filters && filters.order && 'sort' in filters && filters.sort)
+            final.orderby = `${filters.order} ${filters.sort}`;
+
+        let page = 0;
+        if ('page' in filters && filters.page) {
+            if (!Validator.isNumber(filters.page.toString())) throw new InvalidParameterType('', 'page', 'number');
+            page = Number(filters.page);
+        }
+
+        let limit = UserGlobals.QUERY_LENGTH;
+        if ('limit' in filters && filters.limit) {
+            if (!Validator.isNumber(filters.limit.toString())) throw new InvalidParameterType('', 'limit', 'number');
+            limit = Number(filters.limit);
+        }
+
+        const offset = page * limit;
+        final.limit = `${limit} OFFSET ${offset}`;
+
+        return final;
     }
 }
