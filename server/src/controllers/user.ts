@@ -1,6 +1,5 @@
-
 import { NextFunction } from 'express';
-// import { HttpCodes } from '../helpers/httpCodesEnum';
+import { HttpCodes } from '../helpers/httpCodesEnum';
 import { InjectedRequest, InjectedResponse } from '../interfaces/express';
 import { IFailedResponse, ISuccessfulResponse } from '../interfaces/response';
 import { IUserProperties } from '../interfaces/user';
@@ -24,5 +23,4 @@ export default class UserController {
         // res.response = response;
         next();
     }
-
 }

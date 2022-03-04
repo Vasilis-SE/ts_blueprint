@@ -1,4 +1,3 @@
-
 import { NextFunction, Router } from 'express';
 import BaseController from '../controllers/baseController';
 import UserController from '../controllers/user';
@@ -13,7 +12,5 @@ userRoutes.post(
     (req: any, res: any, next: NextFunction) => _controller.createUser(req, res, next),
     (req: any, res: any, next: NextFunction) => _baseController.send(req, res, next),
 );
-
-
 
 export default userRoutes;

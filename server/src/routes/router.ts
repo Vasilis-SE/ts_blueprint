@@ -14,7 +14,6 @@ export default class Routes {
     }
 
     private initialize(): void {
-
         // Load all seperate routes
         this._routes.use('/user', userRoutes);
     }
