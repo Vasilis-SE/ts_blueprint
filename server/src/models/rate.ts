@@ -51,12 +51,12 @@ export default class RateModel implements IRate {
 
     async changeRatingType(): Promise<boolean> {
         try {
-            const query = await PostgreSQL.client.query(`UPDATE ratings 
+            const queryString = `UPDATE ratings 
                 SET type = ${this.getType()}
-                WHERE 
-                    username = '${this.getUsername()}' AND
-                    movieid = ${this.getMovieId()}
-                LIMIT 1`);
+                WHERE username = $1 AND movieid = $2`
+
+            const query = await PostgreSQL.client.query(queryString, 
+                [this.getUsername(), this.getMovieId()]);
             if (query.rowCount === 0) throw Error();
             return true;
         } catch (error) {

@@ -29,3 +29,44 @@ export class FailedToRateMovie implements IException {
     }
 }
 
+export class NoRatingFound implements IException {
+    status: boolean;
+    message: string;
+    errorCode: string;
+    httpCode: number;
+
+    constructor(message?: string) {
+        this.status = false;
+        this.message = message ? message : 'Could not find the rating you have made on the movie...';
+        this.errorCode = 'rt3';
+        this.httpCode = HttpCodes.NOT_FOUND;
+    }
+}
+
+export class InvalidRating implements IException {
+    status: boolean;
+    message: string;
+    errorCode: string;
+    httpCode: number;
+
+    constructor(message?: string) {
+        this.status = false;
+        this.message = message ? message : 'Invalid rating that is beeing sent...';
+        this.errorCode = 'rt4';
+        this.httpCode = HttpCodes.BAD_REQUEST;
+    }
+}
+
+export class CannotRateYourOwnMovie implements IException {
+    status: boolean;
+    message: string;
+    errorCode: string;
+    httpCode: number;
+
+    constructor(message?: string) {
+        this.status = false;
+        this.message = message ? message : 'You cannot rate movies that you have created...';
+        this.errorCode = 'rt5';
+        this.httpCode = HttpCodes.FORBIDDEN;
+    }
+}

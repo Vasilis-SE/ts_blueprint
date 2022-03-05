@@ -18,4 +18,12 @@ userRoutes.post(
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 
+// Route that changes the rating of the user.
+userRoutes.patch(
+    '/',
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.changeRate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
+);
+
 export default userRoutes;

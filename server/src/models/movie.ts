@@ -50,13 +50,13 @@ export default class MovieModel implements IMovie {
 
     async createMovie(): Promise<boolean> {
         try {
-            const query = await PostgreSQL.client.query(`INSERT INTO movies 
+            const queryString = `INSERT INTO movies 
                 (title, description, username, created_at) VALUES 
-                (
-                    '${this.getTitle()}', '${this.getDescription()}', 
-                    '${this.getUsername()}', ${this.getCreatedAtStamp()}
-                )
-                RETURNING id, likes, hates`);
+                ($1, $2, $3, $4)
+                RETURNING id, likes, hates`;
+            
+            const query = await PostgreSQL.client.query(queryString, [this.getTitle(), 
+                this.getDescription(), this.getUsername(), this.getCreatedAtStamp()]);
             if (query.rowCount === 0) throw Error();
 
             // Set the newly created id
@@ -67,10 +67,10 @@ export default class MovieModel implements IMovie {
         }
     }
 
-    async likeMovie(): Promise<boolean> {
+    async changeLike(toIncr:boolean): Promise<boolean> {
         try {
             const query = await PostgreSQL.client.query(`UPDATE movies 
-                SET likes = likes + 1 
+                SET likes = ${toIncr ? 'likes + 1' : 'likes - 1'} 
                 WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
                 RETURNING likes`);
             if (query.rowCount === 0) throw Error();
@@ -83,10 +83,10 @@ export default class MovieModel implements IMovie {
         }
     }
 
-    async hateMovie(): Promise<boolean> {
+    async changeHate(toIncr:boolean): Promise<boolean> {
         try {
             const query = await PostgreSQL.client.query(`UPDATE movies 
-                SET hates = hates + 1 
+                SET hates = ${toIncr ? 'hates + 1' : 'hates - 1'} 
                 WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
                 RETURNING hates`);
             if (query.rowCount === 0) throw Error();
@@ -129,7 +129,7 @@ export default class MovieModel implements IMovie {
         this.title = t;
     }
     setDescription(d: string): void {
-        this.description = d;
+        this.description = d.replace(/'/g, "\\'");
     }
     setUsername(u: string): void {
         this.username = u;

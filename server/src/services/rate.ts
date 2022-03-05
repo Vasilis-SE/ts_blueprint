@@ -1,5 +1,5 @@
 import { NoMovies } from "../exceptions/movie";
-import { FailedToRateMovie, UserAlreadyRated } from "../exceptions/rate";
+import { CannotRateYourOwnMovie, FailedToRateMovie, InvalidRating, NoRatingFound, UserAlreadyRated } from "../exceptions/rate";
 import { ExcessiveBodyProperties, InvalidParameterType, InvalidPropertyType, PropertyIsMissing } from "../exceptions/validation";
 import { HttpCodes } from "../helpers/httpCodesEnum";
 import ObjectHandler from "../helpers/objectHandler";
@@ -35,6 +35,10 @@ export default class RateService {
             let movieDataResults = await _movieModel.getMovies();
             if(!movieDataResults) throw new NoMovies();
             const movieData: IMovieProperties = movieDataResults[0];
+
+            // Check if movie is created by the user that is requesting the rating.
+            if(movieData.username === user.username)
+                throw new CannotRateYourOwnMovie();
                 
             // Check if user already voted for specific movie
             const _model = new RateModel();
@@ -52,10 +56,10 @@ export default class RateService {
             // Increment likes or hates
             _movieModel.setUsername(movieData.username);
             if(payload.type) {
-                if(!await _movieModel.likeMovie())
+                if(!await _movieModel.changeLike(true))
                     throw new FailedToRateMovie();
             } else {
-                if(!await _movieModel.hateMovie())
+                if(!await _movieModel.changeHate(true))
                     throw new FailedToRateMovie();
             }
 
@@ -71,9 +75,84 @@ export default class RateService {
                 !(e instanceof InvalidPropertyType) &&
                 !(e instanceof NoMovies) &&
                 !(e instanceof UserAlreadyRated) &&
-                !(e instanceof FailedToRateMovie)
+                !(e instanceof FailedToRateMovie) &&
+                !(e instanceof CannotRateYourOwnMovie)
             ) throw e;
 
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
+
+    async changeRating(user: IUserProperties, payload: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {            
+            const validProperties = ['movieid', 'type'];
+            if (Object.keys(payload).length > validProperties.length) throw new ExcessiveBodyProperties();
+
+            // Check fields integrity
+            if (!('movieid' in payload) || !payload.movieid) 
+                throw new PropertyIsMissing('', 'movieid');
+            if (!('type' in payload)) 
+                throw new PropertyIsMissing('', 'type');
+
+            if (typeof payload.movieid !== 'number') 
+                throw new InvalidPropertyType('', 'number', 'movieid');
+            if (typeof payload.type !== 'boolean') 
+                throw new InvalidPropertyType('', 'type', 'boolean');
+
+            // Check if the given movie id exists
+            const _movieModel = new MovieModel({id: payload.movieid});
+            let movieDataResults = await _movieModel.getMovies();
+            if(!movieDataResults) throw new NoMovies();
+            const movieData: IMovieProperties = movieDataResults[0];
+
+            // Check if movie is created by the user that is requesting the rating.
+            if(movieData.username === user.username)
+                throw new CannotRateYourOwnMovie();
+
+            // Check if user voted for specific movie
+            const _model = new RateModel();
+            _model.setUsername(user.username);
+            _model.setMovieId(payload.movieid);
+
+            const userRatingResults = await _model.getRattings(await this._getRateFilters({limit: 1}));
+            if(!userRatingResults) throw new NoRatingFound();
+            const userRating: IRateProperties = userRatingResults[0];
+
+            // If the rating that sent is the same with the one casted before then exit
+            if(userRating.type === payload.type) 
+                throw new InvalidRating();
+
+            // Change rating on rating table for specific user & movieid
+            _model.setType(payload.type);
+            if(!await _model.changeRatingType())
+                throw new FailedToRateMovie();
+
+            // If the user now likes the movie then subtract 1 from dislikes and add 1 to likes.
+            // Else subtract 1 from likes and add 1 in dislikes
+            _movieModel.setUsername(movieData.username);
+            const likesStatus = await _movieModel.changeLike(payload.type ? true : false);
+            const hatesStatus = await _movieModel.changeHate(payload.type ? false : true);
+            if(!likesStatus || !hatesStatus) throw new FailedToRateMovie();
+
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK
+            };
+            return response;
+        } catch (e) {
+            if(
+                !(e instanceof ExcessiveBodyProperties) &&
+                !(e instanceof PropertyIsMissing) &&
+                !(e instanceof InvalidPropertyType) &&
+                !(e instanceof NoMovies) &&
+                !(e instanceof NoRatingFound) &&
+                !(e instanceof InvalidRating) &&
+                !(e instanceof FailedToRateMovie) && 
+                !(e instanceof CannotRateYourOwnMovie)
+            ) throw e;
+            
             const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
             const error: IFailedResponse = errorResource;
             return error;

@@ -22,4 +22,10 @@ export default class RateController {
         next();
     }
 
+    async changeRate(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+        const payload: IRateProperties = { ...req.body };
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.changeRating(req.user, payload);
+        res.response = response;
+        next();
+    }
 }
