@@ -1,17 +1,17 @@
 export interface IRateProperties {
     username?: string;
     movieid?: number;
-    type?: boolean;
+    type?: boolean | undefined;
 }
 
 export interface IRate extends IRateProperties {
     getUsername(): string;
     getMovieId(): number;
-    getType(): boolean;
+    getType(): boolean | undefined;
 
     setUsername(usr?: string): void;
     setMovieId(mi?: number): void;
-    setType(t?: boolean): void;
+    setType(t?: boolean | undefined): void;
 }
 
 export type IListOfRattings = Array<IRateProperties>;

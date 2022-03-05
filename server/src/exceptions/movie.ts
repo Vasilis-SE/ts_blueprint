@@ -43,3 +43,4 @@ export class NoMovies implements IException {
         this.httpCode = HttpCodes.NOT_FOUND;
     }
 }
+
