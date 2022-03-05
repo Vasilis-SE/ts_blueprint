@@ -6,6 +6,7 @@ import { NextFunction } from 'express';
 import { IFailedResponse, ISuccessfulResponse, ISuccessfulResponseData } from '../interfaces/response';
 import { InvalidTokenProvided } from '../exceptions/security';
 import ObjectHandler from '../helpers/objectHandler';
+import RedisClient from '../connections/redis';
 
 // Load enviromentals
 require('../bin/env');
@@ -49,7 +50,7 @@ export default class Security {
         })(req, res, next);
     }
 
-    generateUserToken(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
+    async generateUserToken(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
         try {
             if (!('response' in res) || !res.response.status) throw Error();
 
@@ -65,6 +66,9 @@ export default class Security {
             const payload = decode(token) as JwtPayload;
             content.data = { token, exp: payload.exp };
             res.response = content;
+
+            // Log new token to redis
+            await RedisClient.client.hSet(process.env.USER_TOKEN_PATH, contentData.id, token);
 
             next();
         } catch (e) {
