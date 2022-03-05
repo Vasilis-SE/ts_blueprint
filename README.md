@@ -1,8 +1,8 @@
 # MovieRama
 
 <p>
-    Application that displays movies to user's where they 
-    can add their own like/dislike others and view them.
+    Social media application that displays movies to user's where they 
+    can add their own like/dislike others and view them. 
 </p>
 
 ## Technologies 
@@ -54,3 +54,11 @@
         or <code>npm run docker:up:dev</code> to compose UP the image.
     </li>
 </ol>
+
+## Future Updates/Tweaks
+
+<p>
+    All the future updates/tweak that can be made on the application as well as the whole
+    development process and the task that were created, issues and so on are located on
+    <a href="https://github.com/Vasilis-SE/MovieRama/projects/1" target="_blank"> Github's Project Panel </a>
+</p>

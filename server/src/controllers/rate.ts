@@ -16,8 +16,8 @@ export default class RateController {
     }
 
     async addRate(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
-        const payload: IRateProperties = req.body;
-        const response: ISuccessfulResponse | IFailedResponse = await this._service.addRating(payload);
+        const payload: IRateProperties = { ...req.body };
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.addRating(req.user, payload);
         res.response = response;
         next();
     }

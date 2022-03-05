@@ -5,22 +5,24 @@ import { HttpCodes } from "../helpers/httpCodesEnum";
 import ObjectHandler from "../helpers/objectHandler";
 import Validator from "../helpers/validator";
 import { IRequestQueryFilters } from "../interfaces/express";
+import { IMovieProperties } from "../interfaces/movie";
 import { IRateFilters, IRateProperties, RateGlobals } from "../interfaces/rate";
 import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
+import { IUserProperties } from "../interfaces/user";
 import MovieModel from "../models/movie";
 import RateModel from "../models/rate";
 
 export default class RateService {
 
-    async addRating(payload: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
+    async addRating(user: IUserProperties, payload: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
         try {
-            const validProperties = ['username', 'movieid', 'type'];
+            const validProperties = ['movieid', 'type'];
             if (Object.keys(payload).length > validProperties.length) throw new ExcessiveBodyProperties();
 
             // Check fields integrity
             if (!('movieid' in payload) || !payload.movieid) 
                 throw new PropertyIsMissing('', 'movieid');
-            if (!('type' in payload) || !payload.type) 
+            if (!('type' in payload)) 
                 throw new PropertyIsMissing('', 'type');
 
             if (typeof payload.movieid !== 'number') 
@@ -30,12 +32,13 @@ export default class RateService {
 
             // Check if the given movie id exists
             const _movieModel = new MovieModel({id: payload.movieid});
-            if(!await _movieModel.getMovies())
-                throw new NoMovies();
+            let movieDataResults = await _movieModel.getMovies();
+            if(!movieDataResults) throw new NoMovies();
+            const movieData: IMovieProperties = movieDataResults[0];
                 
             // Check if user already voted for specific movie
             const _model = new RateModel();
-            _model.setUsername(payload.username);
+            _model.setUsername(user.username);
             _model.setMovieId(payload.movieid);
 
             if(await _model.getRattings(await this._getRateFilters({limit: 1})))
@@ -47,18 +50,18 @@ export default class RateService {
                 throw new FailedToRateMovie();
 
             // Increment likes or hates
-            _movieModel.setUsername(payload.username);
-            if(payload.type) 
+            _movieModel.setUsername(movieData.username);
+            if(payload.type) {
                 if(!await _movieModel.likeMovie())
                     throw new FailedToRateMovie();
-            else
+            } else {
                 if(!await _movieModel.hateMovie())
                     throw new FailedToRateMovie();
+            }
 
             const response: ISuccessfulResponse = {
                 status: true,
                 httpCode: HttpCodes.CREATED,
-                data: ObjectHandler.getResource(_movieModel),
             };
             return response;
         } catch (e) {
