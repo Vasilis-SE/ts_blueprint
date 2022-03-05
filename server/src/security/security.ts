@@ -25,37 +25,40 @@ export default class Security {
             ignoreExpiration: false,
         };
 
-        passport.use(new JwtStrategy(options, async (jwtPayload: JwtPayload, done: any) => {
-            try {
-                const userid = jwtPayload.id;
+        passport.use(
+            new JwtStrategy(options, async (jwtPayload: JwtPayload, done: any) => {
+                try {
+                    const userid = jwtPayload.id;
 
-                // Get credentials of user to attach to request. That way the app 
-                // can use the data whenever it wants (logging movements, storing movie). 
-                const _model = new UserModel({id: userid});
-                const user = await _model.getUsers({fields: ['id', 'username', 'created_at']});
-                if (!user) throw new CouldNotFindUser();
+                    // Get credentials of user to attach to request. That way the app
+                    // can use the data whenever it wants (logging movements, storing movie).
+                    const _model = new UserModel({ id: userid });
+                    const user = await _model.getUsers({ fields: ['id', 'username', 'created_at'] });
+                    if (!user) throw new CouldNotFindUser();
 
-                done(null, user[0]);
-            } catch (err) {
-                done(err);
-            }
-        },),);
+                    done(null, user[0]);
+                } catch (err) {
+                    done(err);
+                }
+            }),
+        );
     }
 
     authenticate(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
         return passport.authenticate('jwt', { session: false }, async (err, user, info) => {
             try {
-                if (err) throw new InvalidTokenProvided();
+                if (err || !user) throw new InvalidTokenProvided();
 
                 const authorizationHeader: string = req.headers.authorization;
+                if (!authorizationHeader) throw new InvalidTokenProvided();
+
                 const token: string = authorizationHeader.replace('JWT', '').trim();
 
                 const cachedToken = await RedisClient.client.get(`${process.env.USER_TOKEN_PATH}:${user.id}`);
-                if(!cachedToken || cachedToken !== token)
-                    throw new InvalidTokenProvided();
-     
+                if (!cachedToken || cachedToken !== token) throw new InvalidTokenProvided();
+
                 req.user = user;
-                next(); 
+                next();
             } catch (e) {
                 if (!(e instanceof InvalidTokenProvided)) throw e;
 
@@ -74,36 +77,34 @@ export default class Security {
             const contentData: ISuccessfulResponseData = content.data;
             if (!('id' in contentData) || !contentData.id) throw Error();
 
-            let rememberMeFlag = ('rm' in req.query) && req.query.rm === 'true'
-                ? true : false;
+            const rememberMeFlag = 'rm' in req.query && req.query.rm === 'true' ? true : false;
 
-            let token: string = '';
-            let resp: Object = {};
-            if(rememberMeFlag) {
+            let token = '';
+            if (rememberMeFlag) {
                 token = sign(contentData, process.env.JWT_TOP_SECRET);
             } else {
                 token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 7200 });
             }
 
             const payload = decode(token) as JwtPayload;
-            
+
             // Log new token to redis
             await RedisClient.client.set(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, token);
 
-            if(!rememberMeFlag) {
+            if (!rememberMeFlag) {
                 content.data = { token, exp: payload.exp };
                 res.response = content;
 
-                let seconds: number = payload.exp - (Math.round(Date.now() / 1000))
+                const seconds: number = payload.exp - Math.round(Date.now() / 1000);
                 await RedisClient.client.expire(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, seconds);
             } else {
                 content.data = { token };
-                res.response = content;    
+                res.response = content;
             }
 
             next();
         } catch (e) {
-            console.log(e)
+            console.log(e);
             next();
         }
     }

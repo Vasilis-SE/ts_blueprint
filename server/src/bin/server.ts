@@ -7,7 +7,6 @@ import helmet from 'helmet';
 import Routes from '../routes/router';
 import passport from 'passport';
 
-
 export default class Server {
     private _app: express.Application;
     private _routes: Routes;

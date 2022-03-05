@@ -87,7 +87,7 @@ export default class UserService {
             const finalFilters: IUserFilters = await this._getUserFilters(filters);
             const _model = new UserModel(user);
 
-            finalFilters.fields = ['id', 'username'];
+            finalFilters.fields = ['id', 'username', 'created_at'];
             const results: any = await _model.getUsers(finalFilters);
             if (!results) throw new CouldNotFindUser();
 

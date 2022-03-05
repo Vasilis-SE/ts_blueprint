@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import {  IUserProperties } from './user';
+import { IUserProperties } from './user';
 import { Response } from 'express';
 import { IFailedResponse, ISuccessfulResponse } from './response';
 

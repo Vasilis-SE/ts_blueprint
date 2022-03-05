@@ -16,13 +16,8 @@ export default class UserController {
     }
 
     async getUserProfile(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
-
-        console.log(req.user);
-
-        const query: any = req.query;
-        const params: any = req.params;
-
-        const response: ISuccessfulResponse | IFailedResponse = await this._service.getUsers(params, query);
+        const params: IUserProperties = { id: req.user.id };
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.getUsers(params, {});
         res.response = response;
         next();
     }
