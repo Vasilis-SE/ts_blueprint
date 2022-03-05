@@ -26,8 +26,14 @@ movieRoutes.get(
 );
 
 movieRoutes.get(
-    // '/:range(^\d{10}\s*,\s*\d{10})',
-    '/:range',
+    '/:range([0-9]{10},[0-9]{10})',
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getMoviesList(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
+);
+
+movieRoutes.get(
+    '/:username',
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getMoviesList(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
