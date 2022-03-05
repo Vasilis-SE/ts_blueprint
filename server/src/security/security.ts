@@ -1,10 +1,15 @@
 import passport from 'passport';
-import { Strategy as JwtStrategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { sign, decode, JwtPayload } from 'jsonwebtoken';
 import { InjectedRequest, InjectedResponse } from '../interfaces/express';
 import { NextFunction } from 'express';
-import { ISuccessfulResponse, ISuccessfulResponseData } from '../interfaces/response';
+import { IFailedResponse, ISuccessfulResponse, ISuccessfulResponseData } from '../interfaces/response';
+import { InvalidTokenProvided } from '../exceptions/security';
+import ObjectHandler from '../helpers/objectHandler';
+
+// Load enviromentals
+require('../bin/env');
+
 
 export default class Security {
     constructor() {
@@ -12,10 +17,6 @@ export default class Security {
     }
 
     initializeJWTStrategy() {
-        // This check is done mainly for ts compiler undefined error.
-        if(!process.env.JWT_TOP_SECRET) 
-            return false;
-
         passport.use(
             new JwtStrategy({
                 jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
@@ -31,6 +32,22 @@ export default class Security {
                 }
             },),
         );
+    }
+
+    authenticate(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
+        return passport.authenticate('jwt', { session: false }, (err, user, info) => {
+            try {
+                if (err || !user) throw new InvalidTokenProvided();
+                req.user = user;
+                next(); 
+            } catch (e) {
+                if (!(e instanceof InvalidTokenProvided)) throw e;
+
+                const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+                const error: IFailedResponse = errorResource;
+                res.status(e.httpCode).json(error);
+            }
+        })(req, res, next);
     }
 
     generateUserToken(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {

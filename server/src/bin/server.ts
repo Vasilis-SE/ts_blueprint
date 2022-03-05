@@ -5,6 +5,8 @@ import cors from 'cors';
 import * as http from 'http';
 import helmet from 'helmet';
 import Routes from '../routes/router';
+import passport from 'passport';
+
 
 export default class Server {
     private _app: express.Application;
@@ -26,6 +28,7 @@ export default class Server {
         this._app.use(bodyParser.urlencoded({ extended: true }));
         this._app.use(cors());
         this._app.use(helmet());
+        this._app.use(passport.initialize());
         this._app.use('/api', this._routes.getAppRoutes());
 
         this._app.use((req, res) => {

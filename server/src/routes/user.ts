@@ -18,6 +18,7 @@ userRoutes.post(
 // Route that fetches a user by its id
 userRoutes.get(
     '/:id(\\d+)',
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getUsers(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );

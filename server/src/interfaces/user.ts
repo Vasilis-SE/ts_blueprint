@@ -35,5 +35,4 @@ export type IListOfUsers = Array<IUserProperties>;
 
 export interface IUserTokenContent {
     id: number;
-    email: string;
 }
