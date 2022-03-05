@@ -67,6 +67,39 @@ export default class MovieModel implements IMovie {
         }
     }
 
+    async likeMovie(): Promise<boolean> {
+        try {
+            const query = await PostgreSQL.client.query(`UPDATE movies 
+                SET likes = likes + 1 
+                WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
+                LIMIT 1
+                RETURNING likes`);
+            if (query.rowCount === 0) throw Error();
+
+            // Set the newly created id
+            this.setLikes(query.rows[0].likes);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async hateMovie(): Promise<boolean> {
+        try {
+            const query = await PostgreSQL.client.query(`UPDATE movies 
+                SET hates = hates + 1 
+                WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
+                LIMIT 1
+                RETURNING hates`);
+            if (query.rowCount === 0) throw Error();
+
+            // Set the newly created id
+            this.setHates(query.rows[0].hates);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 
 
     getId(): number {

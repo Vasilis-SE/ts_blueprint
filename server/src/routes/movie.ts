@@ -33,7 +33,7 @@ movieRoutes.get(
 );
 
 movieRoutes.get(
-    '/:username',
+    '/:username([0-9a-zA-z]+)',
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getMoviesList(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
