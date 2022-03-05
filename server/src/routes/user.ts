@@ -17,16 +17,9 @@ userRoutes.post(
 
 // Route that fetches a user by its id
 userRoutes.get(
-    '/:id(\\d+)',
+    '/profile',
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
-    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getUsers(req, res, next),
-    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
-);
-
-// Route that fetches a user by he's username
-userRoutes.get(
-    '/:username',
-    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getUsers(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.getUserProfile(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 

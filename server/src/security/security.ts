@@ -10,7 +10,6 @@ import ObjectHandler from '../helpers/objectHandler';
 // Load enviromentals
 require('../bin/env');
 
-
 export default class Security {
     constructor() {
         this.initializeJWTStrategy();

@@ -15,6 +15,13 @@ export default class UserController {
         this._service = new UserService();
     }
 
+    async getUserProfile(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+
+        // const response: ISuccessfulResponse | IFailedResponse = await this._service.getUsers(params, query);
+        // res.response = response;
+        next();
+    }
+
     async createUser(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
         const payload: IUserProperties = req.body;
         const response: ISuccessfulResponse | IFailedResponse = await this._service.createUser(payload);
