@@ -21,8 +21,9 @@ export default class UserModel implements IUser {
 
     async getUsers(filters: IUserFilters = {}): Promise<IListOfUsers | boolean> {
         try {
-            const wherePart = ObjectHandler.objectToSQLParams(ObjectHandler.getResource(this), ' AND ');
             let results: IListOfUsers = [];
+            const resource = ObjectHandler.getResource(this);
+            const wherePart = ObjectHandler.objectToSQLParams(resource, ' AND ');
 
             const query = await PostgreSQL.client.query(`SELECT 
                 ${filters.fields ? filters.fields.join(', ') : '*'}

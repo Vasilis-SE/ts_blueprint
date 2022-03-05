@@ -7,6 +7,8 @@ import { IFailedResponse, ISuccessfulResponse, ISuccessfulResponseData } from '.
 import { InvalidTokenProvided } from '../exceptions/security';
 import ObjectHandler from '../helpers/objectHandler';
 import RedisClient from '../connections/redis';
+import UserModel from '../models/user';
+import { CouldNotFindUser } from '../exceptions/user';
 
 // Load enviromentals
 require('../bin/env');
@@ -17,27 +19,41 @@ export default class Security {
     }
 
     initializeJWTStrategy() {
-        passport.use(
-            new JwtStrategy({
-                jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
-                secretOrKey: process.env.JWT_TOP_SECRET,
-                ignoreExpiration: false,
-            }, async (jwtPayload: JwtPayload, done: any) => {
-                try {
-                    const userid = jwtPayload.id;
+        const options = {
+            jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
+            secretOrKey: process.env.JWT_TOP_SECRET,
+            ignoreExpiration: false,
+        };
 
-                    done(null);
-                } catch (err) {
-                    done(err);
-                }
-            },),
-        );
+        passport.use(new JwtStrategy(options, async (jwtPayload: JwtPayload, done: any) => {
+            try {
+                const userid = jwtPayload.id;
+
+                // Get credentials of user to attach to request. That way the app 
+                // can use the data whenever it wants (logging movements, storing movie). 
+                const _model = new UserModel({id: userid});
+                const user = await _model.getUsers({fields: ['id', 'username', 'created_at']});
+                if (!user) throw new CouldNotFindUser();
+
+                done(null, user[0]);
+            } catch (err) {
+                done(err);
+            }
+        },),);
     }
 
     authenticate(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
-        return passport.authenticate('jwt', { session: false }, (err, user, info) => {
+        return passport.authenticate('jwt', { session: false }, async (err, user, info) => {
             try {
-                if (err || !user) throw new InvalidTokenProvided();
+                if (err) throw new InvalidTokenProvided();
+
+                const authorizationHeader: string = req.headers.authorization;
+                const token: string = authorizationHeader.replace('JWT', '').trim();
+
+                const cachedToken = await RedisClient.client.get(`${process.env.USER_TOKEN_PATH}:${user.id}`);
+                if(!cachedToken || cachedToken !== token)
+                    throw new InvalidTokenProvided();
+     
                 req.user = user;
                 next(); 
             } catch (e) {
