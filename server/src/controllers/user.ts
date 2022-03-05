@@ -43,4 +43,14 @@ export default class UserController {
         res.response = response;
         next();
     }
+
+    async logoutUser(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+        const authorizationHeader: string = req.headers.authorization;
+        const token: string = authorizationHeader.replace('JWT', '').trim();
+        const user: IUserProperties = req.user;
+
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.logoutUser(user, token);
+        res.response = response;
+        next();
+    }
 }

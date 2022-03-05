@@ -1,5 +1,5 @@
 import { FailedToRenderHash } from '../exceptions/security';
-import { CouldNotFindUser, UserAlreadyExists, UserCreationFailed } from '../exceptions/user';
+import { CouldNotFindUser, UnableToLogout, UserAlreadyExists, UserCreationFailed } from '../exceptions/user';
 import {
     ContainsInvalidChars,
     ExcessiveBodyProperties,
@@ -151,6 +151,29 @@ export default class UserService {
             return error;
         }
     }
+
+    async logoutUser(user: IUserProperties, token: string): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            const _model = new UserModel(user);
+            if(!await _model.deleteUserToken(token))
+                throw new UnableToLogout();
+
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK,
+                data: { id: user.id },
+            };
+            return response;
+        } catch (e) {
+            if (!(e instanceof ExcessiveBodyProperties))
+                throw e;
+
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
+
 
     /**
      * Protected class function of UserService that is used to clear and gather all the

@@ -1,4 +1,5 @@
 import PostgreSQL from '../connections/postgres';
+import RedisClient from '../connections/redis';
 import ObjectHandler from '../helpers/objectHandler';
 import { IListOfUsers, IUser, IUserFilters, IUserProperties } from '../interfaces/user';
 
@@ -53,6 +54,22 @@ export default class UserModel implements IUser {
         } catch (error) {
             return false;
         }
+    }
+
+    async getUserToken(): Promise<string | null> {
+        return await RedisClient.client.get(`${process.env.USER_TOKEN_PATH}:${this.getId()}`);
+    }
+
+    async setNewUserToken(token: string): Promise<boolean> {
+        return await RedisClient.client.set(`${process.env.USER_TOKEN_PATH}:${this.getId()}`, token);
+    }
+
+    async setExpirationToToken(seconds: number): Promise<boolean> {
+        return await RedisClient.client.expire(`${process.env.USER_TOKEN_PATH}:${this.getId()}`, seconds);
+    }
+
+    async deleteUserToken(token: string): Promise<boolean> {
+        return await RedisClient.client.del(`${process.env.USER_TOKEN_PATH}:${this.getId()}`);
     }
 
     getId(): number {

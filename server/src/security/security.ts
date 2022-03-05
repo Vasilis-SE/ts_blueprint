@@ -6,7 +6,6 @@ import { NextFunction } from 'express';
 import { IFailedResponse, ISuccessfulResponse, ISuccessfulResponseData } from '../interfaces/response';
 import { InvalidTokenProvided } from '../exceptions/security';
 import ObjectHandler from '../helpers/objectHandler';
-import RedisClient from '../connections/redis';
 import UserModel from '../models/user';
 import { CouldNotFindUser } from '../exceptions/user';
 
@@ -54,7 +53,8 @@ export default class Security {
 
                 const token: string = authorizationHeader.replace('JWT', '').trim();
 
-                const cachedToken = await RedisClient.client.get(`${process.env.USER_TOKEN_PATH}:${user.id}`);
+                const _model = new UserModel({ id: user.id });
+                const cachedToken = await _model.getUserToken();
                 if (!cachedToken || cachedToken !== token) throw new InvalidTokenProvided();
 
                 req.user = user;
@@ -89,14 +89,15 @@ export default class Security {
             const payload = decode(token) as JwtPayload;
 
             // Log new token to redis
-            await RedisClient.client.set(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, token);
+            const _model = new UserModel({ id: contentData.id });
+            await _model.setNewUserToken(token);
 
             if (!rememberMeFlag) {
                 content.data = { token, exp: payload.exp };
                 res.response = content;
 
                 const seconds: number = payload.exp - Math.round(Date.now() / 1000);
-                await RedisClient.client.expire(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, seconds);
+                await _model.setExpirationToToken(seconds);
             } else {
                 content.data = { token };
                 res.response = content;
