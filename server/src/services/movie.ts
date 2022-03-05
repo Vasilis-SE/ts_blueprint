@@ -1,10 +1,10 @@
-import { CouldNotCreateNewMovie, MovieAlreadyExists } from "../exceptions/movie";
-import { ContainsInvalidChars, ExcessiveBodyProperties, InputExceedMaxLimit, InvalidParameterType, InvalidPropertyType, PropertyIsMissing } from "../exceptions/validation";
+import { CouldNotCreateNewMovie, MovieAlreadyExists, NoMovies } from "../exceptions/movie";
+import { ContainsInvalidChars, ExcessiveBodyProperties, InputExceedMaxLimit, InvalidParameterFormat, InvalidParameterType, InvalidPropertyType, PropertyIsMissing } from "../exceptions/validation";
 import { HttpCodes } from "../helpers/httpCodesEnum";
 import ObjectHandler from "../helpers/objectHandler";
 import Validator from "../helpers/validator";
 import { IRequestQueryFilters } from "../interfaces/express";
-import { IMovieFilters, IMovieProperties, MovieGlobals } from "../interfaces/movie";
+import { IMovieFilters, IMovieProperties, IMovieUrlParameters, MovieGlobals } from "../interfaces/movie";
 import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
 import MovieModel from "../models/movie";
 
@@ -71,9 +71,38 @@ export default class MovieService {
         }
     }
 
+    async getMovies(params: IMovieUrlParameters, query: IRequestQueryFilters): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            // Create filters for the query
+            const finalFilters: IMovieFilters = await this._getMovieFilters(query);
+            if(('range' in params) && params.range != '') {
+                if(params.range.indexOf(',') === -1)
+                    throw new InvalidParameterFormat('', 'range', '1646492022,1646492028');
 
+                const stampsParts = params.range.split(',');
+                finalFilters.where = `created_at BETWEEN ${Number(stampsParts[0].trim())} AND ${Number(stampsParts[1].trim())}`;
+                delete params.range;
+            } 
 
+            const _model = new MovieModel(params);
+            const results = await _model.getMovies(finalFilters);
+            if (!results) throw new NoMovies();
 
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK,
+                data: ObjectHandler.getResource(results),
+            };
+            return response;
+        } catch (e) {
+            if(!(e instanceof InvalidParameterFormat) && !(e instanceof NoMovies))
+                throw e;
+
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
 
     /**
      * Protected class function of UserService that is used to clear and gather all the
@@ -107,5 +136,4 @@ export default class MovieService {
 
         return final;
     }
-
 }

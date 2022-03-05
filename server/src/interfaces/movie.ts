@@ -33,10 +33,15 @@ export enum MovieGlobals {
     QUERY_SORT_METHOD = 'ASC',
 }
 
+export interface IMovieUrlParameters extends IMovieProperties {
+    range?: string;
+}
+
 export interface IMovieFilters {
     fields?: Array<string>; // Fields are used on queries to fetch specific fields
     orderby?: string; // Order by for the query
     limit?: string; // Limit for the query
+    where?: string; // Replacement where clause for the query
 }
 
 export type IListOfMovies = Array<IMovieProperties>;

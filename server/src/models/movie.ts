@@ -29,8 +29,18 @@ export default class MovieModel implements IMovie {
         try {
             let results: IListOfMovies = [];
             const resource = ObjectHandler.getResource(this);
-            const wherePart = ObjectHandler.objectToSQLParams(resource, ' AND ');
+            const wherePart = filters.where && filters.where != '' 
+                ? filters.where
+                : ObjectHandler.objectToSQLParams(resource, ' AND ');
 
+                console.log(filters);
+            console.log(`SELECT 
+                ${filters.fields ? filters.fields.join(', ') : '*'}
+                FROM movies 
+                ${wherePart ? `WHERE ${wherePart}` : ''}
+                ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}
+                ${'limit' in filters ? `LIMIT ${filters.limit}` : ''}`);
+            
             const query = await PostgreSQL.client.query(`SELECT 
                 ${filters.fields ? filters.fields.join(', ') : '*'}
                 FROM movies 

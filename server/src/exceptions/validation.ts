@@ -129,7 +129,6 @@ export class InvalidPassword implements IException {
     }
 }
 
-
 export class RequestBodyIsEmpty implements IException {
     public status: boolean;
     public message: string;
@@ -141,5 +140,23 @@ export class RequestBodyIsEmpty implements IException {
         this.message = message ? message : 'Request body is empty. Missing all the necessary data...';
         this.errorCode = 'ev10';
         this.httpCode = HttpCodes.BAD_REQUEST;
+    }
+}
+
+export class InvalidParameterFormat implements IException {
+    public status: boolean;
+    public message: string;
+    public errorCode: string;
+    public httpCode: number;
+    public property?: string;
+    public expected?: string;
+
+    constructor(message?: string, p?: string, ex?: string) {
+        this.status = false;
+        this.message = message ? message : 'It seems your parameter has invalid format...';
+        this.errorCode = 'ev11';
+        this.httpCode = HttpCodes.BAD_REQUEST;
+        this.property = p;
+        this.expected = ex;
     }
 }
