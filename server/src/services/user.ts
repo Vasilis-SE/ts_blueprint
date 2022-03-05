@@ -30,7 +30,7 @@ export default class UserService {
             if (typeof payload.username !== 'string') throw new InvalidPropertyType('', 'string', 'username');
             if (typeof payload.password !== 'string') throw new InvalidPropertyType('', 'string', 'password');
 
-            if (Validator.hasSpecialCharacters(payload.username)) throw new ContainsInvalidChars('', 'username');
+            if (Validator.hasSpecialCharacters(payload.username, '_ALL')) throw new ContainsInvalidChars('', 'username');
             if (payload.username.length > UserGlobals.USERNAME_MAXLENGTH) throw new InputExceedMaxLimit('', 'username');
 
             // Check if password is strong & hash it

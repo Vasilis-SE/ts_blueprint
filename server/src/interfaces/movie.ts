@@ -4,11 +4,11 @@ export interface IMovieProperties {
     description?: string;
     username?: string;
     likes?: number;
-    hate?: number;
+    hates?: number;
     created_at?: number;
 }
 
-export interface IUser extends IMovieProperties {
+export interface IMovie extends IMovieProperties {
     getId(): number;
     getTitle(): string;
     getDescription(): string;

@@ -1,5 +1,7 @@
 import { NextFunction } from "express";
 import { InjectedRequest, InjectedResponse } from "../interfaces/express";
+import { IMovieProperties } from "../interfaces/movie";
+import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
 
 import MovieService from '../services/movie';
 
@@ -15,10 +17,16 @@ export default class MovieController {
     }
 
     async createMovie(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
-        // const payload: IUserProperties = req.body;
-        // const response: ISuccessfulResponse | IFailedResponse = await this._service.createUser(payload);
+        // Get the requests payload and also the username from the authenticated user
+        // (the one that is going to create the new movie).
+        const payload: IMovieProperties = {
+            username: req.user.username,
+            ...req.body
+        };
+
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.createMovie(payload);
         // res.response = response;
-        next();
+        // next();
     }
 
 }

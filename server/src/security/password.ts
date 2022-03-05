@@ -36,7 +36,7 @@ export default class Password {
         if (Validator.hasLowerCase(this.password)) points++;
         if (Validator.hasUpperCase(this.password)) points++;
         if (Validator.hasNumbers(this.password)) points++;
-        if (Validator.hasSpecialCharacters(this.password)) points++;
+        if (Validator.hasSpecialCharacters(this.password, '_ALL')) points++;
         if (this.isPasswordLong()) points++;
 
         return points >= 3;
