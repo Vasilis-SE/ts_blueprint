@@ -25,8 +25,8 @@ export default class MovieController {
         };
 
         const response: ISuccessfulResponse | IFailedResponse = await this._service.createMovie(payload);
-        // res.response = response;
-        // next();
+        res.response = response;
+        next();
     }
 
 }

@@ -14,3 +14,18 @@ export class MovieAlreadyExists implements IException {
         this.httpCode = HttpCodes.BAD_REQUEST;
     }
 }
+
+export class CouldNotCreateNewMovie implements IException {
+    status: boolean;
+    message: string;
+    errorCode: string;
+    httpCode: number;
+
+    constructor(message?: string) {
+        this.status = false;
+        this.message = message ? message 
+            : 'Error occurred while trying to create new movie. Please try again later...';
+        this.errorCode = 'mv2';
+        this.httpCode = HttpCodes.BAD_REQUEST;
+    }
+}

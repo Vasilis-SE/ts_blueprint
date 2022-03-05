@@ -1,6 +1,6 @@
 import PostgreSQL from '../connections/postgres';
 import ObjectHandler from '../helpers/objectHandler';
-import { IMovie, IMovieProperties } from '../interfaces/movie';
+import { IListOfMovies, IMovie, IMovieFilters, IMovieProperties } from '../interfaces/movie';
 
 export default class MovieModel implements IMovie {
     id!: number;
@@ -24,6 +24,48 @@ export default class MovieModel implements IMovie {
         this.setHates(movie.hates ? movie.hates : 0);
         this.setCreatedAtStamp(movie.created_at ? movie.created_at : 0);
     }
+
+    async getMovies(filters: IMovieFilters = {}): Promise<IListOfMovies | boolean> { 
+        try {
+            let results: IListOfMovies = [];
+            const resource = ObjectHandler.getResource(this);
+            const wherePart = ObjectHandler.objectToSQLParams(resource, ' AND ');
+
+            const query = await PostgreSQL.client.query(`SELECT 
+                ${filters.fields ? filters.fields.join(', ') : '*'}
+                FROM movies 
+                ${wherePart ? `WHERE ${wherePart}` : ''}
+                ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}
+                ${'limit' in filters ? `LIMIT ${filters.limit}` : ''}`);
+            if (query.rowCount === 0) throw Error();
+
+            results = query.rows;
+            return results;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async createMovie(): Promise<boolean> {
+        try {
+            const query = await PostgreSQL.client.query(`INSERT INTO movies 
+                (title, description, username, created_at) VALUES 
+                (
+                    '${this.getTitle()}', '${this.getDescription()}', 
+                    '${this.getUsername()}', ${this.getCreatedAtStamp()}
+                )
+                RETURNING id, likes, hates`);
+            if (query.rowCount === 0) throw Error();
+
+            // Set the newly created id
+            this.setId(query.rows[0].id);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+
 
     getId(): number {
         return this.id;
