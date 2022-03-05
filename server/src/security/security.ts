@@ -58,20 +58,36 @@ export default class Security {
             const contentData: ISuccessfulResponseData = content.data;
             if (!('id' in contentData) || !contentData.id) throw Error();
 
-            const token = sign(contentData, process.env.JWT_TOP_SECRET, {
-                expiresIn: 7200, // 7200 seconds - 120 mins
-            });
+            let rememberMeFlag = ('rm' in req.query) && req.query.rm === 'true'
+                ? true : false;
 
-            // Need to fetch the expiration time
+            let token: string = '';
+            let resp: Object = {};
+            if(rememberMeFlag) {
+                token = sign(contentData, process.env.JWT_TOP_SECRET);
+            } else {
+                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 7200 });
+            }
+
             const payload = decode(token) as JwtPayload;
-            content.data = { token, exp: payload.exp };
-            res.response = content;
-
+            
             // Log new token to redis
-            await RedisClient.client.hSet(process.env.USER_TOKEN_PATH, contentData.id, token);
+            await RedisClient.client.set(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, token);
+
+            if(!rememberMeFlag) {
+                content.data = { token, exp: payload.exp };
+                res.response = content;
+
+                let seconds: number = payload.exp - (Math.round(Date.now() / 1000))
+                await RedisClient.client.expire(`${process.env.USER_TOKEN_PATH}:${contentData.id}`, seconds);
+            } else {
+                content.data = { token };
+                res.response = content;    
+            }
 
             next();
         } catch (e) {
+            console.log(e)
             next();
         }
     }
