@@ -1,6 +1,6 @@
 import React from "react";
 import { Alert } from "react-bootstrap";
-import IErrorAlert from "../../interfaces/components";
+import { IErrorAlert } from "../../interfaces/components";
 
 export default function ErrorAlter({ title, content }: IErrorAlert) {
   return (
