@@ -5,7 +5,7 @@ import ObjectHandler from "../helpers/objectHandler";
 import Validator from "../helpers/validator";
 import { IRequestQueryFilters } from "../interfaces/express";
 import { IMovieFilters, IMovieProperties, IMovieUrlParameters, MovieGlobals } from "../interfaces/movie";
-import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
+import { IFailedResponse, IMetaProperties, ISuccessfulResponse } from "../interfaces/response";
 import MovieModel from "../models/movie";
 
 export default class MovieService { 
@@ -101,6 +101,43 @@ export default class MovieService {
             const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
             const error: IFailedResponse = errorResource;
             return error;
+        }
+    }
+
+    async getMoviesMeta(baseUrl: string, resultsNum: number, params: IMovieUrlParameters, query: IRequestQueryFilters): Promise<IMetaProperties | boolean> {
+        try {
+            let _prev: string = "";
+            let _next: string = "";
+            let queryClonePrev = {...query};
+            let queryCloneNext = {...query};
+
+            const _model = new MovieModel(params);
+            const moviesCount = await _model.reportMoviesCount();
+            if(!moviesCount) return false;
+
+            let page = ('page' in query) && query.page > 0 ? query.page : 0;
+            let limit = ('limit' in query) && query.limit > 0 
+                ? query.limit
+                : MovieGlobals.QUERY_LENGTH;
+            const offset = (page * limit) + resultsNum;
+
+            let _pages: number = Math.ceil(Number(moviesCount) / limit);
+
+            if (page) {
+                queryClonePrev.page--;
+                _prev = `${baseUrl}?${Object.keys(queryClonePrev)
+                    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(queryClonePrev[k])}`).join('&')}`
+            }
+
+            if(offset < moviesCount) {
+                queryCloneNext.page++;
+                _next = `${baseUrl}?${Object.keys(queryCloneNext)
+                    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(queryCloneNext[k])}`).join('&')}`
+            }
+
+            return {_num: Number(moviesCount), _pages, _prev, _next};
+        } catch (error) {
+            return false;
         }
     }
 

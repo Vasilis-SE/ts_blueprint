@@ -17,5 +17,5 @@ a {
 
 /* Util classes */
 .justify-content-right {
-  justify-content: right;
+  justify-content: right !important;
 }

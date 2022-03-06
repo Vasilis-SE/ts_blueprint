@@ -25,6 +25,26 @@ export default class MovieModel implements IMovie {
         this.setCreatedAtStamp(movie.created_at ? movie.created_at : 0);
     }
 
+    async reportMoviesCount(filters: IMovieFilters = {}): Promise<number | boolean> {
+        try {
+            const resource = ObjectHandler.getResource(this);
+            const wherePart = filters.where && filters.where != '' 
+                ? filters.where
+                : ObjectHandler.objectToSQLParams(resource, ' AND ');
+
+            const queryString = `SELECT COUNT(id) FROM movies
+                ${wherePart ? `WHERE ${wherePart}` : ''}
+                ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}`;
+
+            const query = await PostgreSQL.client.query(queryString);
+            if (query.rowCount === 0) throw Error();
+            return Number(query.rows[0].count);
+        } catch (error) {
+            return false;
+        }
+    }
+
+
     async getMovies(filters: IMovieFilters = {}): Promise<IListOfMovies | boolean> { 
         try {
             let results: IListOfMovies = [];
