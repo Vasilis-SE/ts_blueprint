@@ -33,8 +33,7 @@ export default class MovieModel implements IMovie {
                 : ObjectHandler.objectToSQLParams(resource, ' AND ');
 
             const queryString = `SELECT COUNT(id) FROM movies
-                ${wherePart ? `WHERE ${wherePart}` : ''}
-                ${'orderby' in filters ? `ORDER BY ${filters.orderby}` : ''}`;
+                ${wherePart ? `WHERE ${wherePart}` : ''}`;
 
             const query = await PostgreSQL.client.query(queryString);
             if (query.rowCount === 0) throw Error();

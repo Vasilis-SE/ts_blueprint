@@ -81,7 +81,7 @@ export default class MovieService {
 
                 const stampsParts = params.range.split(',');
                 finalFilters.where = `created_at BETWEEN ${Number(stampsParts[0].trim())} AND ${Number(stampsParts[1].trim())}`;
-                delete params.range;
+                // delete params.range;
             } 
 
             const _model = new MovieModel(params);
@@ -111,9 +111,20 @@ export default class MovieService {
             let queryClonePrev = {...query};
             let queryCloneNext = {...query};
 
+            // Create filters for the query
+            const finalFilters: IMovieFilters = await this._getMovieFilters(query);
+            if(('range' in params) && params.range != '') {
+                if(params.range.indexOf(',') === -1)
+                    throw new InvalidParameterFormat('', 'range', '1646492022,1646492028');
+
+                const stampsParts = params.range.split(',');
+                finalFilters.where = `created_at BETWEEN ${Number(stampsParts[0].trim())} AND ${Number(stampsParts[1].trim())}`;
+                delete params.range;
+            } 
+            
             const _model = new MovieModel(params);
-            const moviesCount = await _model.reportMoviesCount();
-            if(!moviesCount) return false;
+            const moviesCount = await _model.reportMoviesCount(finalFilters);
+            if(!moviesCount) throw new Error();
 
             let page = ('page' in query) && query.page > 0 ? query.page : 0;
             let limit = ('limit' in query) && query.limit > 0 
@@ -137,6 +148,7 @@ export default class MovieService {
 
             return {_num: Number(moviesCount), _pages, _prev, _next};
         } catch (error) {
+            console.log(error)
             return false;
         }
     }
