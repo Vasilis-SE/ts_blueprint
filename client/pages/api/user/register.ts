@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import {
   IFailedResponse,
   ISuccessfulResponseData,
-} from "../../interfaces/response";
-import Fetch from "../../service/fetch";
+} from "../../../interfaces/response";
+import Fetch from "../../../service/fetch";
 
 export default async function handler(
   req: NextApiRequest,

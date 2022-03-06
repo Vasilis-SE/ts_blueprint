@@ -13,7 +13,7 @@ export default function MoviesList() {
     setFinished(false);
 
     const handleMoviesResponse = async () => {
-      const data: any = await Fetch.get("/api");
+      const data: any = await Fetch.get("/api/movie");
       if (!data.status) setErrorMessage(data.message);
       else setMovies(data.data);
 
