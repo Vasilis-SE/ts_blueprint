@@ -71,7 +71,7 @@ export default class MovieModel implements IMovie {
         try {
             const query = await PostgreSQL.client.query(`UPDATE movies 
                 SET likes = ${toIncr ? 'likes + 1' : 'likes - 1'} 
-                WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
+                WHERE id = ${this.getId()}
                 RETURNING likes`);
             if (query.rowCount === 0) throw Error();
 
@@ -87,7 +87,7 @@ export default class MovieModel implements IMovie {
         try {
             const query = await PostgreSQL.client.query(`UPDATE movies 
                 SET hates = ${toIncr ? 'hates + 1' : 'hates - 1'} 
-                WHERE id = ${this.getId()} AND username = '${this.getUsername()}'
+                WHERE id = ${this.getId()}
                 RETURNING hates`);
             if (query.rowCount === 0) throw Error();
 

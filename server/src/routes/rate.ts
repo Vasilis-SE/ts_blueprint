@@ -14,7 +14,7 @@ const _controller = new RateController();
 userRoutes.post(
     '/',
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
-    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.addRate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.addRating(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 
@@ -22,7 +22,15 @@ userRoutes.post(
 userRoutes.patch(
     '/',
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
-    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.changeRate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.changeRating(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
+);
+
+// Route that retracts a rating of a user
+userRoutes.delete(
+    '/:movieid([0-9]+)',
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.retractRating(req, res, next),
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 

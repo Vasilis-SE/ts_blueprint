@@ -1,5 +1,5 @@
 import { NoMovies } from "../exceptions/movie";
-import { CannotRateYourOwnMovie, FailedToRateMovie, InvalidRating, NoRatingFound, UserAlreadyRated } from "../exceptions/rate";
+import { CannotRateYourOwnMovie, FailedDeletingRating, FailedToRateMovie, InvalidRating, NoRatingFound, UserAlreadyRated } from "../exceptions/rate";
 import { ExcessiveBodyProperties, InvalidParameterType, InvalidPropertyType, PropertyIsMissing } from "../exceptions/validation";
 import { HttpCodes } from "../helpers/httpCodesEnum";
 import ObjectHandler from "../helpers/objectHandler";
@@ -54,7 +54,6 @@ export default class RateService {
                 throw new FailedToRateMovie();
 
             // Increment likes or hates
-            _movieModel.setUsername(movieData.username);
             if(payload.type) {
                 if(!await _movieModel.changeLike(true))
                     throw new FailedToRateMovie();
@@ -131,7 +130,6 @@ export default class RateService {
 
             // If the user now likes the movie then subtract 1 from dislikes and add 1 to likes.
             // Else subtract 1 from likes and add 1 in dislikes
-            _movieModel.setUsername(movieData.username);
             const likesStatus = await _movieModel.changeLike(payload.type ? true : false);
             const hatesStatus = await _movieModel.changeHate(payload.type ? false : true);
             if(!likesStatus || !hatesStatus) throw new FailedToRateMovie();
@@ -159,6 +157,59 @@ export default class RateService {
         }
     }
 
+    async retractRating(user: IUserProperties, params: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            if (!('movieid' in params) || !params.movieid) 
+                throw new PropertyIsMissing('', 'movieid');
+            if (!Validator.isNumber(params.movieid.toString())) 
+                throw new InvalidPropertyType('', 'number', 'movieid');
+
+            // Get the rating of user
+            const _model = new RateModel({username: user.username, movieid: params.movieid});
+            const userRatingResults = await _model.getRattings(await this._getRateFilters({limit: 1}));
+            if(!userRatingResults) throw new NoRatingFound();
+            const userRating: IRateProperties = userRatingResults[0];
+
+            // Check if the given movie id exists
+            const _movieModel = new MovieModel({id: params.movieid});
+            let movieDataResults = await _movieModel.getMovies();
+            if(!movieDataResults) throw new NoMovies();
+            const movieData: IMovieProperties = movieDataResults[0];
+
+            // Delete user's rating
+            if(!await _model.removeRating())
+                throw new FailedDeletingRating();
+
+            // Alter hates or likes on movies table based on the rating the user previously had
+            if(userRating.type) {
+                if(!await _movieModel.changeLike(false))
+                    throw new FailedDeletingRating();
+            } else {
+                if(!await _movieModel.changeHate(false))
+                    throw new FailedDeletingRating();
+            }
+  
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.OK
+            };
+            return response;
+        } catch (e) {
+            if(
+                !(e instanceof PropertyIsMissing) &&
+                !(e instanceof InvalidPropertyType) &&
+                !(e instanceof NoRatingFound) &&
+                !(e instanceof NoMovies) &&
+                !(e instanceof FailedDeletingRating) 
+            ) throw e;
+            
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }
+    }
+
+
     /**
      * Protected class function of UserService that is used to clear and gather all the
      * filter data needed. Filters are used for managing queries on database. For example
@@ -166,7 +217,7 @@ export default class RateService {
      * @param filters Object of IRequestQueryFilters interface that contains the filters.
      * @returns Object of IUserFilters interface which contains the final filters a query will use.
      */
-     protected _getRateFilters(filters: IRequestQueryFilters): IRateFilters {
+    protected _getRateFilters(filters: IRequestQueryFilters): IRateFilters {
         const final: IRateFilters = {};
 
         // Set order by filter

@@ -15,16 +15,23 @@ export default class RateController {
         this._service = new RateService();
     }
 
-    async addRate(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+    async addRating(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
         const payload: IRateProperties = { ...req.body };
         const response: ISuccessfulResponse | IFailedResponse = await this._service.addRating(req.user, payload);
         res.response = response;
         next();
     }
 
-    async changeRate(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+    async changeRating(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
         const payload: IRateProperties = { ...req.body };
         const response: ISuccessfulResponse | IFailedResponse = await this._service.changeRating(req.user, payload);
+        res.response = response;
+        next();
+    }
+
+    async retractRating(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
+        const params: IRateProperties = req.params;
+        const response: ISuccessfulResponse | IFailedResponse = await this._service.retractRating(req.user, params);
         res.response = response;
         next();
     }

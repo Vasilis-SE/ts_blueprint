@@ -70,3 +70,17 @@ export class CannotRateYourOwnMovie implements IException {
         this.httpCode = HttpCodes.FORBIDDEN;
     }
 }
+
+export class FailedDeletingRating implements IException {
+    status: boolean;
+    message: string;
+    errorCode: string;
+    httpCode: number;
+
+    constructor(message?: string) {
+        this.status = false;
+        this.message = message ? message : 'Error occurred while trying to delete rating...';
+        this.errorCode = 'rt6';
+        this.httpCode = HttpCodes.SERVER_ERROR;
+    }
+}
