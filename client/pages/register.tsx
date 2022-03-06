@@ -1,6 +1,8 @@
 import React from "react";
 import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import { NextPage } from "next";
+import IUserRegisterProperties from "../interfaces/user";
+import ErrorAlter from "../components/utils/errorAlert";
 
 const Register: NextPage = () => {
   const [username, setUsername] = React.useState("");
@@ -9,6 +11,8 @@ const Register: NextPage = () => {
   const [usernameError, setUsernameError] = React.useState("");
   const [passwordError, setPasswordError] = React.useState("");
   const [repasswordError, setRePasswordError] = React.useState("");
+
+  const [alertError, setAlertError] = React.useState<any>({});
 
   const handleUsernameChange = (event: any) => {
     setUsername(event.target.value);
@@ -41,13 +45,22 @@ const Register: NextPage = () => {
     setPasswordError("");
     setRePassword("");
     setRePasswordError("");
+    setAlertError({});
   };
 
   const handleFormSubmit = (event: any) => {
-    if (usernameError != "" || passwordError != "" || repasswordError != "") return;
+    setAlertError({});
+    if (usernameError != "" || passwordError != "" || repasswordError != "")
+      return;
 
+    if (password != repassword)
+      return setAlertError({
+        title: "Password mismatch!",
+        content:
+          "The password and the retype password fields you have provided mismatch! Check again your input...",
+      });
 
-
+    const payload: IUserRegisterProperties = { username, password };
   };
 
   return (
@@ -92,18 +105,37 @@ const Register: NextPage = () => {
 
           <Row className="gap-2">
             <Col xs={12} md={4} lg={3}>
-              <Button variant="outline-primary" className="w-100">
+              <Button
+                variant="outline-primary"
+                className="w-100"
+                onClick={handleFormSubmit}
+              >
                 Register
               </Button>
             </Col>
             <Col xs={12} md={4} lg={3}>
-              <Button variant="outline-danger" className="w-100" onClick={handleClearForm}>
+              <Button
+                variant="outline-danger"
+                className="w-100"
+                onClick={handleClearForm}
+              >
                 Clear Form
               </Button>
             </Col>
           </Row>
         </Form>
       </Row>
+
+      {Object.keys(alertError).length > 0 ? (
+        <Row xs={12}>
+          <ErrorAlter
+            title={alertError.title}
+            content={alertError.content}
+          ></ErrorAlter>
+        </Row>
+      ) : (
+        ""
+      )}
     </Container>
   );
 };
