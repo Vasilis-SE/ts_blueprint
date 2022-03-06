@@ -1,18 +1,8 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import {
-  IFailedResponse,
-  ISuccessfulResponse,
-} from "../../interfaces/response";
+import Fetch from "../../service/fetch";
 import MovieCard from "./movieCard";
 import MovieCardPlaceHolder from "./movieCardPlaceholder";
-
-const fetchMoviesForIndex = async (): Promise<
-  ISuccessfulResponse | IFailedResponse
-> => {
-  let response = await fetch("/api").then((response) => response.json());
-  return response;
-};
 
 export default function MoviesList() {
   const [finished, setFinished] = React.useState(false);
@@ -23,8 +13,7 @@ export default function MoviesList() {
     setFinished(false);
 
     const handleMoviesResponse = async () => {
-      const data: any = await fetchMoviesForIndex();
-
+      const data: any = await Fetch.get("/api");
       if (!data.status) setErrorMessage(data.message);
       else setMovies(data.data);
 
@@ -32,7 +21,7 @@ export default function MoviesList() {
     };
 
     // Delay requesyt to display results (given a better feeling...)
-    setTimeout(() => handleMoviesResponse(), 7300);
+    setTimeout(() => handleMoviesResponse(), 1000);
   }, []);
 
   const buildMovieList = () => {

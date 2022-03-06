@@ -3,6 +3,7 @@ import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import { NextPage } from "next";
 import IUserRegisterProperties from "../interfaces/user";
 import ErrorAlter from "../components/utils/errorAlert";
+import Fetch from "../service/fetch";
 
 const Register: NextPage = () => {
   const [username, setUsername] = React.useState("");
@@ -48,7 +49,7 @@ const Register: NextPage = () => {
     setAlertError({});
   };
 
-  const handleFormSubmit = (event: any) => {
+  const handleFormSubmit = async (event: any) => {
     setAlertError({});
     if (usernameError != "" || passwordError != "" || repasswordError != "")
       return;
@@ -61,69 +62,73 @@ const Register: NextPage = () => {
       });
 
     const payload: IUserRegisterProperties = { username, password };
+    const response: any = await Fetch.post("/api/register", payload);
+    return response;
   };
 
   return (
     <Container className="p-4">
       <Row xs={12} md={9} lg={7}>
-        <Form>
-          <Form.Group className="mb-3" controlId="formBasicUsername">
-            <Form.Label>Username:</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter a username here..."
-              value={username}
-              onChange={handleUsernameChange}
-            />
+        <section className="p-3">
+          <Form>
+            <Form.Group className="mb-3" controlId="formBasicUsername">
+              <Form.Label>Username:</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter a username here..."
+                value={username}
+                onChange={handleUsernameChange}
+              />
 
-            <Form.Text className="text-danger">{usernameError}</Form.Text>
-          </Form.Group>
+              <Form.Text className="text-danger">{usernameError}</Form.Text>
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password:</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Enter a password here..."
-              value={password}
-              onChange={handlePasswordChange}
-            />
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Password:</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter a password here..."
+                value={password}
+                onChange={handlePasswordChange}
+              />
 
-            <Form.Text className="text-danger">{passwordError}</Form.Text>
-          </Form.Group>
+              <Form.Text className="text-danger">{passwordError}</Form.Text>
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicRePassword">
-            <Form.Label>Retype Password:</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Retype your password here..."
-              value={repassword}
-              onChange={handleRePasswordChange}
-            />
+            <Form.Group className="mb-3" controlId="formBasicRePassword">
+              <Form.Label>Retype Password:</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Retype your password here..."
+                value={repassword}
+                onChange={handleRePasswordChange}
+              />
 
-            <Form.Text className="text-danger">{repasswordError}</Form.Text>
-          </Form.Group>
+              <Form.Text className="text-danger">{repasswordError}</Form.Text>
+            </Form.Group>
 
-          <Row className="gap-2">
-            <Col xs={12} md={4} lg={3}>
-              <Button
-                variant="outline-primary"
-                className="w-100"
-                onClick={handleFormSubmit}
-              >
-                Register
-              </Button>
-            </Col>
-            <Col xs={12} md={4} lg={3}>
-              <Button
-                variant="outline-danger"
-                className="w-100"
-                onClick={handleClearForm}
-              >
-                Clear Form
-              </Button>
-            </Col>
-          </Row>
-        </Form>
+            <Row className="gap-2">
+              <Col xs={12} md={4} lg={3}>
+                <Button
+                  variant="outline-primary"
+                  className="w-100"
+                  onClick={handleFormSubmit}
+                >
+                  Register
+                </Button>
+              </Col>
+              <Col xs={12} md={4} lg={3}>
+                <Button
+                  variant="outline-danger"
+                  className="w-100"
+                  onClick={handleClearForm}
+                >
+                  Clear Form
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </section>
       </Row>
 
       {Object.keys(alertError).length > 0 ? (

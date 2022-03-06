@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { IFailedResponse, ISuccessfulResponseData } from '../../interfaces/response';
+import Fetch from '../../service/fetch';
 
 export default async function handler(
   req: NextApiRequest,
@@ -7,10 +8,7 @@ export default async function handler(
 ) {
   if (req.method !== 'GET') return;
 
-  let response: ISuccessfulResponseData | IFailedResponse = 
-    await fetch(`${process.env.API_BASE_URL}/movie?page=0&limit=${process.env.RESULTS_LIMIT}&order=${process.env.MOVIES_ORDER_BY}&sort=${process.env.MOVIES_ORDER_METHOD}`)
-      .then(response => response.json())
-      .then(data => {return data});
- 
+  const response: ISuccessfulResponseData | IFailedResponse = 
+    await Fetch.get(`${process.env.API_BASE_URL}/movie?page=0&limit=${process.env.RESULTS_LIMIT}&order=${process.env.MOVIES_ORDER_BY}&sort=${process.env.MOVIES_ORDER_METHOD}`);
   res.status(response.httpCode).json(response);
 }
