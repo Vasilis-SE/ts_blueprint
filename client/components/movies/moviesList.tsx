@@ -24,7 +24,6 @@ export default function MoviesList() {
 
     const handleMoviesResponse = async () => {
       const data: any = await fetchMoviesForIndex();
-      console.log(">> ", data);
 
       if (!data.status) setErrorMessage(data.message);
       else setMovies(data.data);
@@ -33,7 +32,7 @@ export default function MoviesList() {
     };
 
     // Delay requesyt to display results (given a better feeling...)
-    setTimeout(() => handleMoviesResponse(), 1300);
+    setTimeout(() => handleMoviesResponse(), 7300);
   }, []);
 
   const buildMovieList = () => {

@@ -1,22 +1,11 @@
 import React from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
 import { IMovieProperties } from "../../interfaces/movies";
-import {
-  IFailedResponse,
-  ISuccessfulResponse,
-} from "../../interfaces/response";
 import LocalStorage from "../../service/storage";
 
 const convertTimestampToData = (timestamp = 0) => {
   return new Date(timestamp * 1000).toLocaleTimeString("el-GR");
 };
-
-// const fetchMoviesForIndex = async (): Promise<
-//   ISuccessfulResponse | IFailedResponse
-// > => {
-//   let response = await fetch("/api").then((response) => response.json());
-//   return response;
-// };
 
 export default function MovieCard({
   id,
