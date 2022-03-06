@@ -182,7 +182,7 @@ export default class UserService {
      * @param filters Object of IRequestQueryFilters interface that contains the filters.
      * @returns Object of IUserFilters interface which contains the final filters a query will use.
      */
-    protected _getUserFilters(filters: IRequestQueryFilters): IUserFilters {
+    public _getUserFilters(filters: IRequestQueryFilters): IUserFilters {
         const final: IUserFilters = {};
 
         // Set order by filter
