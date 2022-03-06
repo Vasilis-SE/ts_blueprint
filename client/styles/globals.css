@@ -19,3 +19,24 @@ a {
 .justify-content-right {
   justify-content: right !important;
 }
+.movie-card {
+  height: 300px;
+  font-size: 13px;
+}
+.card-body {
+  height: 260px;
+}
+.card-title {
+  height: 40px;
+}
+.card-footer {
+  height: 40px;
+}
+.social-button-area {
+  height: 100px;
+}
+.movie-card-discription {
+  height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -9,7 +9,7 @@ const Home: NextPage = () => {
   return (
     <div>
       <Header></Header>
-      <Container>
+      <Container fluid className="p-3">
         <MoviesList></MoviesList>
       </Container>
       <Footer></Footer>
