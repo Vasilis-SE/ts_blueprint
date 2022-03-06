@@ -8,6 +8,7 @@
     "api:prod": "node ./dist/bin/index.js --env=prod",
     "lint": "eslint --quiet --fix ./src/**/*.ts",
     "build": "gulp",
+    "test": "jest --watchAll --no-cache",
     "docker:up:prod": "docker-compose --env-file ./src/config/.env up",
     "docker:build:prod": "docker-compose --env-file ./src/config/.env build",
     "docker:up:dev": "docker-compose --env-file ./src/config/.env.dev up",
