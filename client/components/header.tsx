@@ -1,11 +1,20 @@
-import Head from "next/head";
-import Link from "next/link";
+import { NextPage } from "next";
 import React from "react";
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
+import { ILoginModal } from "../interfaces/components";
+import LoginModal from "./utils/loginModal";
 
-export default function Header() {
+const Header: NextPage = () => {
+  const togleModal = (): void => {
+    setShowLoginModal(!showLoginModal);
+  };
+
+  const [showLoginModal, setShowLoginModal] = React.useState<any>(false);
+
   return (
-    <Head>
+    <>
+      <LoginModal show={showLoginModal} close={togleModal}></LoginModal>
+
       <Navbar bg="light" variant="light">
         <Container>
           <Navbar.Brand href="#home">MovieRama</Navbar.Brand>
@@ -16,13 +25,16 @@ export default function Header() {
         </Container>
 
         <Container className="gap-1 justify-content-right">
-          <Button variant="outline-success">Login</Button>
-
-          <Button variant="outline-info">
-            <Link href="/register">Register</Link>
+          <Button variant="outline-success" onClick={togleModal}>
+            Login
+          </Button>
+          <Button variant="outline-info" href="/register">
+            Register
           </Button>
         </Container>
       </Navbar>
-    </Head>
+    </>
   );
-}
+};
+
+export default Header;

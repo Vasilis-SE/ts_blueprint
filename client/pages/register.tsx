@@ -6,7 +6,6 @@ import ErrorAlter from "../components/utils/errorAlert";
 import Fetch from "../service/fetch";
 import PopupModal from "../components/utils/notifyModal";
 import { IErrorAlert, INotifyModal } from "../interfaces/components";
-import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
 
 const Register: NextPage = () => {
   const handleUsernameChange = (event: any) => {

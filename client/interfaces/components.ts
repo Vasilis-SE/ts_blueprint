@@ -9,3 +9,8 @@ export interface INotifyModal {
   content: string;
   close: Function;
 }
+
+export interface ILoginModal {
+  show: boolean;
+  close: Function;
+}

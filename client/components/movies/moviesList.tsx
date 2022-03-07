@@ -29,8 +29,8 @@ export default function MoviesList() {
 
     for (let movie of movies) {
       cards.push(
-        <Col xs={12} md={6} lg={4}>
-          <MovieCard
+        <Col xs={12} md={6} lg={4} key={`col_${movie.id}`}>
+          <MovieCard key={movie.id}
             id={movie.id}
             title={movie.title}
             description={movie.description}
