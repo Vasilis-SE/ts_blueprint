@@ -7,9 +7,10 @@ import Fetch from "../helpers/fetch";
 import LocalStorage from "../helpers/storage";
 import PopupModal from "./utils/notifyModal";
 import { INotifyModal } from "../interfaces/components";
+import { IGlobalContextProperties } from "../interfaces/contexts";
 
 const Header: NextPage = () => {
-  const global = React.useContext(GlobalContext);
+  const global: IGlobalContextProperties = React.useContext(GlobalContext);
 
   const togleModal = (): void => {
     setShowLoginModal(!showLoginModal);
@@ -33,7 +34,7 @@ const Header: NextPage = () => {
 
     LocalStorage.clearLocalStorage();
     global.update({isLoggedIn: false, update: global.update})
-    // I can reload here...
+    return true;
   };
 
   const _init_modal: INotifyModal = {
