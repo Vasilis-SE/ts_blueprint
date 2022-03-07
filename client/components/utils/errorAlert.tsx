@@ -4,7 +4,7 @@ import { IErrorAlert } from "../../interfaces/components";
 
 export default function ErrorAlter({ title, content }: IErrorAlert) {
   return (
-    <Alert variant="danger" className="my-sm-5">
+    <Alert variant="danger">
       <Alert.Heading> {title} </Alert.Heading>
       <p> {content} </p>
     </Alert>
