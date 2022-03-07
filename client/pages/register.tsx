@@ -1,9 +1,9 @@
 import React from "react";
 import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import { NextPage } from "next";
-import IUserRegisterProperties from "../interfaces/user";
+import {IUserRegisterProperties} from "../interfaces/user";
 import ErrorAlter from "../components/utils/errorAlert";
-import Fetch from "../service/fetch";
+import Fetch from "../helpers/fetch";
 import PopupModal from "../components/utils/notifyModal";
 import { IErrorAlert, INotifyModal } from "../interfaces/components";
 

@@ -3,7 +3,7 @@ import {
   IFailedResponse,
   ISuccessfulResponseData,
 } from "../../../interfaces/response";
-import Fetch from "../../../service/fetch";
+import Fetch from "../../../helpers/fetch";
 
 export default async function handler(
   req: NextApiRequest,

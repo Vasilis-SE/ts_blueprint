@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
 import { IMovieProperties } from "../../interfaces/movies";
-import LocalStorage from "../../service/storage";
+import LocalStorage from "../../helpers/storage";
 
 const convertTimestampToData = (timestamp = 0) => {
   return new Date(timestamp * 1000).toLocaleTimeString("el-GR");

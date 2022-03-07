@@ -1,6 +1,6 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import Fetch from "../../service/fetch";
+import Fetch from "../../helpers/fetch";
 import MovieCard from "./movieCard";
 import MovieCardPlaceHolder from "./movieCardPlaceholder";
 
@@ -48,7 +48,7 @@ export default function MoviesList() {
 
   return finished ? (
     errorMessage != "" ? (
-      <Row></Row>
+      <Row> {errorMessage} </Row>
     ) : (
       buildMovieList()
     )

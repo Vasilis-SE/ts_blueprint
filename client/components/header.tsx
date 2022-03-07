@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import React from "react";
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
-import { ILoginModal } from "../interfaces/components";
 import LoginModal from "./utils/loginModal";
 
 const Header: NextPage = () => {

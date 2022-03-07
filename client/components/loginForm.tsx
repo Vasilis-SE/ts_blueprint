@@ -1,10 +1,10 @@
 import React from "react";
 import { Form, Button, Row } from "react-bootstrap";
-import Fetch from "../service/fetch";
-import IUserLoginProperties from "../interfaces/user";
+import Fetch from "../helpers/fetch";
+import {IUserLoginProperties} from "../interfaces/user";
 import { IErrorAlert } from "../interfaces/components";
 import ErrorAlter from "./utils/errorAlert";
-import LocalStorage from "../service/storage";
+import LocalStorage from "../helpers/storage";
 import Router from 'next/router'
 
 export default function LoginForm() {
@@ -36,16 +36,21 @@ export default function LoginForm() {
       password,
     };
 
-    const response = await Fetch.post("/api/user/login", payload);
-    if (!response.status) {
+    // Attempt login user
+    const loginResponse = await Fetch.post("/api/user/login", payload);
+    if (!loginResponse.status) {
       return setAlertError({
         title: "Login Error!",
-        content: response.message ? response.message : "Error occurred while trying to login...",
+        content: loginResponse.message ? loginResponse.message : "Error occurred while trying to login...",
       });
     }
 
-    await LocalStorage.setData(JSON.stringify(response.data), '_token');
-    Router.reload();
+    // If login was a success fetch profile
+    const profileResponse = await Fetch.get("/api/user");
+
+
+    await LocalStorage.setData(JSON.stringify(loginResponse.data), '_token');
+    Router.reload(); // Force reload
   };
 
   const _init_alert: IErrorAlert = {
