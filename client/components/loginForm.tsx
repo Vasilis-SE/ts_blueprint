@@ -4,6 +4,8 @@ import Fetch from "../service/fetch";
 import IUserLoginProperties from "../interfaces/user";
 import { IErrorAlert } from "../interfaces/components";
 import ErrorAlter from "./utils/errorAlert";
+import LocalStorage from "../service/storage";
+import Router from 'next/router'
 
 export default function LoginForm() {
   const handleUsernameChange = (event: any) => {
@@ -27,6 +29,7 @@ export default function LoginForm() {
   };
 
   const handleLogin = async () => {
+    setAlertError(_init_alert);
     if (username == "" || password == "") return;
     const payload: IUserLoginProperties = {
       username,
@@ -34,13 +37,15 @@ export default function LoginForm() {
     };
 
     const response = await Fetch.post("/api/user/login", payload);
-    console.log(response);
     if (!response.status) {
       return setAlertError({
         title: "Login Error!",
-        content: response.message,
+        content: response.message ? response.message : "Error occurred while trying to login...",
       });
     }
+
+    await LocalStorage.setData(JSON.stringify(response.data), '_token');
+    Router.reload();
   };
 
   const _init_alert: IErrorAlert = {

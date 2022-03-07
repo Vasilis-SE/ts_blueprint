@@ -142,7 +142,8 @@ export default class UserService {
                 !(e instanceof ExcessiveBodyProperties) &&
                 !(e instanceof PropertyIsMissing) &&
                 !(e instanceof InvalidPropertyType) &&
-                !(e instanceof CouldNotFindUser)
+                !(e instanceof CouldNotFindUser) &&
+                !(e instanceof InvalidPassword)
             )
                 throw e;
 

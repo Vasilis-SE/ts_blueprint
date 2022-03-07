@@ -3,7 +3,9 @@ import {
   IFailedResponse,
   ISuccessfulResponseData,
 } from "../../../interfaces/response";
+import IEncryptedProperties from "../../../interfaces/security";
 import IUserRegisterProperties from "../../../interfaces/user";
+import CipherData from "../../../service/cipher";
 import Fetch from "../../../service/fetch";
 
 export default async function handler(
@@ -13,7 +15,7 @@ export default async function handler(
   let response: ISuccessfulResponseData | IFailedResponse = {};
 
   switch (req.method) {
-    case "POST":
+    case "POST": // login
       response = await postHandler(JSON.parse(req.body));
       break;
   }
@@ -24,7 +26,32 @@ export default async function handler(
 const postHandler = async (
   data: IUserRegisterProperties
 ): Promise<ISuccessfulResponseData | IFailedResponse> => {
-  return await Fetch.post(`${process.env.API_BASE_URL}/user/login`, data, {
-    "Content-Type": "application/json",
-  });
+  const response = await Fetch.post(
+    `${process.env.API_BASE_URL}/user/login`,
+    data,
+    {
+      "Content-Type": "application/json",
+    }
+  );
+
+  if (!response.status) return response;
+  if (!process.env.STORAGE_AES_KEY) return { status: false };
+
+  // If login is successfull cipher token to keep data on local storage.
+  // The token is ciphered here because enviromentals here on the back are
+  // accessible.
+  const token = response.data.token;
+  const cipher = new CipherData();
+  const encrypted: IEncryptedProperties = cipher.cipher(
+    token,
+    process.env.STORAGE_AES_KEY
+  );
+  // const dencrypted = await cipher.decipher(encrypted, process.env.STORAGE_AES_KEY);
+  console.log({ status: true, data: encrypted });
+
+  return {
+    status: true,
+    httpCode: response.httpCode,
+    data: encrypted,
+  };
 };

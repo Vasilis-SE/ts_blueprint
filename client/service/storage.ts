@@ -1,16 +1,16 @@
 export default class LocalStorage {
 
-    static getUserToken() {
-        const token = localStorage.getItem('token');
+    static getData(key: string) {
+        const token = localStorage.getItem(key);
         return token ? token : false;
     }
 
-    static setUserToken(token: string) {
-        return localStorage.setItem('token', token);
+    static setData(token: string, key: string) {
+        return localStorage.setItem(key, token);
     }
 
-    static deleteUserToken() {
-        return localStorage.removeItem('token');
+    static deleteData(key: string) {
+        return localStorage.removeItem(key);
     }
 
     static clearLocalStorage() {

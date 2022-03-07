@@ -19,7 +19,6 @@ export default function MovieCard({
   const [canRate, setCanRate] = React.useState(false);
 
   React.useEffect(() => {
-    setCanRate(LocalStorage.getUserToken() ? true : false);
   }, []);
 
   return (
