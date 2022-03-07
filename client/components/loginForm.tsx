@@ -66,7 +66,7 @@ export default function LoginForm() {
 
     LocalStorage.setData(JSON.stringify(profileResponse.data), '_user');
     LocalStorage.setData(tokenData, '_token');
-    Router.reload(); // Force reload
+    // Router.reload(); // Force reload
   };
 
   const _init_alert: IErrorAlert = {

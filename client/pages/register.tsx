@@ -60,7 +60,7 @@ const Register: NextPage = () => {
       });
 
     const payload: IUserRegisterProperties = { username, password };
-    const response: any = await Fetch.post("/api/user/register", payload);
+    const response: any = await Fetch.post("/api/user", payload);
     let newModalState = Object.assign({}, _init_modal); 
     newModalState.show = true;
 

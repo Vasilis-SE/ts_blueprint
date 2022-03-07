@@ -11,16 +11,46 @@ export default async function handler(
     case "GET": // profile
       try {
         const dencryptedToken: string = await mwDecipherToken(req, res);
-        const response = await Fetch.get(`${process.env.API_BASE_URL}/user/profile`, {
-          'Authorization': `JWT ${dencryptedToken}`
-        });
+        const response = await Fetch.get(
+          `${process.env.API_BASE_URL}/user/profile`,
+          {
+            Authorization: `JWT ${dencryptedToken}`,
+          }
+        );
         res.status(response.httpCode).json(response);
-      } catch(e) {
+      } catch (e) {
         if (!(e instanceof InvalidTokenProvided)) throw e;
         const response = { ...e };
-        return res.status(response.httpCode).json(response);    
+        return res.status(response.httpCode).json(response);
+      }
+      break;
+    case "POST": // register
+      const response = await Fetch.post(
+        `${process.env.API_BASE_URL}/user`,
+        JSON.parse(req.body),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+
+      res.status(response.httpCode).json(response);
+
+      break;
+    case "DELETE": // logout
+      try {
+        const dencryptedToken: string = await mwDecipherToken(req, res);
+        const response = await Fetch.delete(
+          `${process.env.API_BASE_URL}/user/logout`,
+          {
+            Authorization: `JWT ${dencryptedToken}`,
+          }
+        );
+        res.status(response.httpCode).json(response);
+      } catch (e) {
+        if (!(e instanceof InvalidTokenProvided)) throw e;
+        const response = { ...e };
+        return res.status(response.httpCode).json(response);
       }
       break;
   }
-
 }

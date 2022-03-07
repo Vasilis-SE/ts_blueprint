@@ -38,4 +38,17 @@ export default class Fetch {
     );
     return response;
   }
+
+  static async delete(url: string, header: object = {}) {
+    const options: any = {
+      method: "DELETE"
+    };
+
+    if (Object.keys(header).length > 0) options.headers = header;
+
+    const response = await fetch(url, options).then((response) =>
+      response.json()
+    );
+    return response;
+  }
 }
