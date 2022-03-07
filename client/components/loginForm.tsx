@@ -1,11 +1,11 @@
 import React from "react";
 import { Form, Button, Row } from "react-bootstrap";
 import Fetch from "../helpers/fetch";
-import {IUserLoginProperties} from "../interfaces/user";
+import { IUserLoginProperties } from "../interfaces/user";
 import { IErrorAlert } from "../interfaces/components";
 import ErrorAlter from "./utils/errorAlert";
 import LocalStorage from "../helpers/storage";
-import Router from 'next/router'
+import Router from "next/router";
 
 export default function LoginForm() {
   const handleUsernameChange = (event: any) => {
@@ -41,15 +41,31 @@ export default function LoginForm() {
     if (!loginResponse.status) {
       return setAlertError({
         title: "Login Error!",
-        content: loginResponse.message ? loginResponse.message : "Error occurred while trying to login...",
+        content: loginResponse.message
+          ? loginResponse.message
+          : "Error occurred while trying to login...",
       });
     }
 
+    const tokenData = JSON.stringify(loginResponse.data);
+
     // If login was a success fetch profile
-    const profileResponse = await Fetch.get("/api/user");
+    let url = `/api/user${rememberMe ? "?rm=true" : ""}`;
+    const profileResponse = await Fetch.get(url, {
+      Authorization: tokenData,
+    });
 
+    if (!profileResponse.status) {
+      return setAlertError({
+        title: "Login Error!",
+        content: profileResponse.message
+          ? profileResponse.message
+          : "Error occurred while trying to fetch profile...",
+      });
+    }
 
-    await LocalStorage.setData(JSON.stringify(loginResponse.data), '_token');
+    LocalStorage.setData(JSON.stringify(profileResponse.data), '_user');
+    LocalStorage.setData(tokenData, '_token');
     Router.reload(); // Force reload
   };
 
@@ -104,7 +120,7 @@ export default function LoginForm() {
 
       {alertError.title != "" ? (
         <Row xs={12} className="my-sm-1">
-          <ErrorAlter 
+          <ErrorAlter
             title={alertError.title}
             content={alertError.content}
           ></ErrorAlter>

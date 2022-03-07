@@ -148,7 +148,6 @@ export default class MovieService {
 
             return {_num: Number(moviesCount), _pages, _prev, _next};
         } catch (error) {
-            console.log(error)
             return false;
         }
     }

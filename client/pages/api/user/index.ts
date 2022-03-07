@@ -1,37 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  IFailedResponse,
-  ISuccessfulResponseData,
-} from "../../../interfaces/response";
-import {IUserRegisterProperties} from "../../../interfaces/user";
 import Fetch from "../../../helpers/fetch";
+import { mwDecipherToken } from "../../../middleware/decipherToken";
+import { InvalidTokenProvided } from "../../../exceptions/authentication";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ISuccessfulResponseData | IFailedResponse>
+  res: NextApiResponse
 ) {
-  let response: ISuccessfulResponseData | IFailedResponse = {};
-
   switch (req.method) {
     case "GET": // profile
-      response = await getHandler();
-      break;
-    case "POST": // register
-      response = await postHandler(JSON.parse(req.body));
+      try {
+        const dencryptedToken: string = await mwDecipherToken(req, res);
+        const response = await Fetch.get(`${process.env.API_BASE_URL}/user/profile`, {
+          'Authorization': `JWT ${dencryptedToken}`
+        });
+        res.status(response.httpCode).json(response);
+      } catch(e) {
+        if (!(e instanceof InvalidTokenProvided)) throw e;
+        const response = { ...e };
+        return res.status(response.httpCode).json(response);    
+      }
       break;
   }
 
-  res.status(response.httpCode).json(response);
 }
-
-const getHandler = async (): Promise<ISuccessfulResponseData | IFailedResponse> => {
-  return await Fetch.get(`${process.env.API_BASE_URL}/user`);
-};
-
-const postHandler = async (
-  data: IUserRegisterProperties
-): Promise<ISuccessfulResponseData | IFailedResponse> => {
-  return await Fetch.post(`${process.env.API_BASE_URL}/user`, data, {
-    "Content-Type": "application/json",
-  });
-};

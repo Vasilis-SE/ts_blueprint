@@ -1,6 +1,13 @@
 export default class Fetch {
-  static async get(url: string) {
-    let response = await fetch(url).then((response) => response.json());
+  static async get(url: string, header: object = {}) {
+    const options: any = {
+      method: "GET"
+    };
+    
+    if (Object.keys(header).length > 0) options.headers = header;
+
+    let response = await fetch(url, options)
+      .then((response) => response.json());
     return response;
   }
 

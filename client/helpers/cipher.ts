@@ -14,7 +14,7 @@ export default class CipherData {
 
     let encrypted = cipher.update(value, "utf-8", "hex");
     encrypted += cipher.final("hex");
-    
+  
     return {
         rb: iv,
         content: encrypted,
