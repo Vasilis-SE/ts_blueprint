@@ -22,13 +22,13 @@ export default class RateService {
                 throw new InvalidPropertyType('', 'type', 'boolean');
             
             const _model = new RateModel(params);
-            const results = await _model.getRattings();
+            const results: any = await _model.getRattings();
             if(!results) throw new NoRatingFound();
 
             const response: ISuccessfulResponse = {
                 status: true,
                 httpCode: HttpCodes.CREATED,
-                data: ObjectHandler.getResource(results),
+                data: results,
             };
             return response;
         } catch (e) {

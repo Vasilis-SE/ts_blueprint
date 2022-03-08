@@ -28,7 +28,7 @@ export default class RateController {
             response = await this._service.addRating(user, payload);   
             response = {...response, proc: 'add'};
         } else if(response.status) {
-            if(('type' in response.data) && response.data.type != payload.type) { // Change rating
+            if(response.data[0].type != payload.type) { // Change rating
                 response = await this._service.changeRating(user, payload);
                 response = {...response, proc: 'change'};
             } else { // Retract rating 

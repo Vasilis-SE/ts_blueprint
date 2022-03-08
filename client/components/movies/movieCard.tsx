@@ -1,9 +1,12 @@
 import React from "react";
 import { Card, Row, Col, Button, Nav } from "react-bootstrap";
 import GlobalContext from "../../context/globalContext";
+import Fetch from "../../helpers/fetch";
+import LocalStorageStore from "../../helpers/storage";
 import { INotifyModal } from "../../interfaces/components";
 import { IGlobalContextProperties } from "../../interfaces/contexts";
 import { IMovieProperties } from "../../interfaces/movies";
+import { IRatePayload } from "../../interfaces/rating";
 import PopupModal from "../utils/notifyModal";
 
 const convertTimestampToData = (timestamp = 0) => {
@@ -31,26 +34,91 @@ export default function MovieCard({
   };
 
   const checkIfTheUserIsTheSame = (): boolean => {
-    if(username != global.user.username) return true;
+    if (username != global.user.username) return true;
     let newModalState = Object.assign({}, _init_modal);
     newModalState.show = true;
     newModalState.title = "Login First!";
     newModalState.content = `You cannot rate your own movies...`;
     setModal(newModalState);
     return false;
-  }
-
-  const handleLikeRating = (e: any) => {
-    setModal(_init_modal);
-    if (!checkIfLoggedIn() || !checkIfTheUserIsTheSame()) return false;
-    
-
-
   };
 
-  const handleHateRating = () => {
+  const handleLikeRating = async (e: any) => {
     setModal(_init_modal);
     if (!checkIfLoggedIn() || !checkIfTheUserIsTheSame()) return false;
+
+    let payload: IRatePayload = {
+      movieid: Number(movie.id),
+      type: true,
+    };
+
+    const tokenPayload = await LocalStorageStore.getData("_token");
+    const rateResponse = await Fetch.post("/api/rate", payload, {
+      Authorization: tokenPayload,
+    });
+    if (!rateResponse.status) {
+      let newModalState = Object.assign({}, _init_modal);
+      newModalState.show = true;
+      newModalState.title = "Rating Error!";
+      newModalState.content = rateResponse.message;
+      setModal(newModalState);
+      return false;
+    }
+
+    let newState = {...movie};
+    switch (rateResponse.proc) {
+      case "add":
+        newState.likes++;
+        break;
+      case "change":
+        newState.likes++;
+        newState.hates--;
+        break;
+      case "retract":
+        newState.likes--;
+        break;
+    }
+
+    setMovie({...newState})
+  };
+
+  const handleHateRating = async () => {
+    setModal(_init_modal);
+    if (!checkIfLoggedIn() || !checkIfTheUserIsTheSame()) return false;
+
+    let payload: IRatePayload = {
+      movieid: Number(movie.id),
+      type: false,
+    };
+
+    const tokenPayload = await LocalStorageStore.getData("_token");
+    const rateResponse = await Fetch.post("/api/rate", payload, {
+      Authorization: tokenPayload,
+    });
+    if (!rateResponse.status) {
+      let newModalState = Object.assign({}, _init_modal);
+      newModalState.show = true;
+      newModalState.title = "Rating Error!";
+      newModalState.content = rateResponse.message;
+      setModal(newModalState);
+      return false;
+    }
+
+    let newState = {...movie};
+    switch (rateResponse.proc) {
+      case "add":
+        newState.hates++;
+        break;
+      case "change":
+        newState.hates++;
+        newState.likes--;
+        break;
+      case "retract":
+        newState.hates--;
+        break;
+    }
+
+    setMovie({...newState})
   };
 
   const togleModal = (): void => {
@@ -66,8 +134,18 @@ export default function MovieCard({
     close: togleModal,
   };
 
+  const _initMovie: IMovieProperties = {
+    id,
+    title,
+    description,
+    username,
+    likes,
+    hates,
+    created_at,
+  };
   const global: IGlobalContextProperties = React.useContext(GlobalContext);
   const [modal, setModal] = React.useState<any>(_init_modal);
+  const [movie, setMovie] = React.useState<any>(_initMovie);
 
   return (
     <>
@@ -80,9 +158,9 @@ export default function MovieCard({
 
       <Card className="movie-card">
         <Card.Body>
-          <Card.Title>{title}</Card.Title>
+          <Card.Title>{movie.title}</Card.Title>
           <Card.Text className="movie-card-discription">
-            {description}
+            {movie.description}
           </Card.Text>
           <Row xs={6} className="social-button-area justify-content-between">
             <Col xs="auto">
@@ -91,7 +169,7 @@ export default function MovieCard({
                 className=""
                 onClick={handleLikeRating}
               >
-                {likes ? likes : 0}
+                {movie.likes ? movie.likes : 0}
               </Button>
             </Col>
             <Col xs="auto">
@@ -100,17 +178,15 @@ export default function MovieCard({
                 className=""
                 onClick={handleHateRating}
               >
-                {hates ? hates : 0}
+                {movie.hates ? movie.hates : 0}
               </Button>
             </Col>
           </Row>
         </Card.Body>
         <Card.Footer>
           <Row xs={6} className="social-button-area justify-content-between">
-            <Col xs="auto">
-              Created by: {username}
-            </Col>
-            <Col xs="auto">{convertTimestampToData(created_at)}</Col>
+            <Col xs="auto">Created by: {movie.username}</Col>
+            <Col xs="auto">{convertTimestampToData(movie.created_at)}</Col>
           </Row>
         </Card.Footer>
       </Card>

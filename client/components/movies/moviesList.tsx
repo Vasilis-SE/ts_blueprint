@@ -42,8 +42,8 @@ export default function MoviesList() {
             title={movie.title}
             description={movie.description}
             username={movie.username}
-            likes={movie.likes}
-            hates={movie.hates}
+            likes={movie.likes ? movie.likes : 0}
+            hates={movie.hates ? movie.hates : 0}
             created_at={movie.created_at}
           ></MovieCard>
         </Col>
