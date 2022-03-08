@@ -43,6 +43,7 @@ export default async function handler(
           `${process.env.API_BASE_URL}/user/logout`,
           {
             Authorization: `JWT ${dencryptedToken}`,
+            "Content-Type": "application/json"
           }
         );
         res.status(response.httpCode).json(response);

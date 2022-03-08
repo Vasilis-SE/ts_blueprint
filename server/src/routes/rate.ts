@@ -34,4 +34,12 @@ userRoutes.delete(
     (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
 );
 
+// Route that decides what type of rating to make based on the action made 
+userRoutes.post(
+    '/movie',
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _security.authenticate(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _controller.rateMovie(req, res, next),
+    (req: InjectedRequest, res: InjectedResponse, next: NextFunction) => _baseController.send(req, res, next),
+);
+
 export default userRoutes;

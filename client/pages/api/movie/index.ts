@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { InvalidTokenProvided } from "../../../exceptions/authentication";
 import Fetch from "../../../helpers/fetch";
-import { mwCheckToken } from "../../../middleware/checkToken";
 import { mwDecipherToken } from "../../../middleware/decipherToken";
 
 export default async function handler(
@@ -27,10 +26,6 @@ export default async function handler(
             "Content-Type": "application/json"
           }
         );
-
-        console.log(JSON.parse(req.body))
-        console.log(response)
-
         res.status(response.httpCode).json(response);
       } catch (e) {
         if (!(e instanceof InvalidTokenProvided)) throw e;

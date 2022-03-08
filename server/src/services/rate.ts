@@ -14,6 +14,35 @@ import RateModel from "../models/rate";
 
 export default class RateService {
 
+    async getRatings(params: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
+        try {
+            if (('movieid' in params) && typeof params.movieid !== 'number') 
+                throw new InvalidPropertyType('', 'number', 'movieid');
+            if (('type' in params) && typeof params.type !== 'boolean') 
+                throw new InvalidPropertyType('', 'type', 'boolean');
+            
+            const _model = new RateModel(params);
+            const results = await _model.getRattings();
+            if(!results) throw new NoRatingFound();
+
+            const response: ISuccessfulResponse = {
+                status: true,
+                httpCode: HttpCodes.CREATED,
+                data: ObjectHandler.getResource(results),
+            };
+            return response;
+        } catch (e) {
+            if(
+                !(e instanceof InvalidPropertyType) &&
+                !(e instanceof NoRatingFound) 
+            ) throw e;
+
+            const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
+            const error: IFailedResponse = errorResource;
+            return error;
+        }   
+    }
+
     async addRating(user: IUserProperties, payload: IRateProperties): Promise<ISuccessfulResponse | IFailedResponse> {
         try {
             const validProperties = ['movieid', 'type'];

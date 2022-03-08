@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Row, Col, Button } from "react-bootstrap";
+import { Card, Row, Col, Button, Nav } from "react-bootstrap";
 import GlobalContext from "../../context/globalContext";
 import { INotifyModal } from "../../interfaces/components";
 import { IGlobalContextProperties } from "../../interfaces/contexts";
@@ -30,18 +30,27 @@ export default function MovieCard({
     return false;
   };
 
-  const handleLikeRating = () => {
+  const checkIfTheUserIsTheSame = (): boolean => {
+    if(username != global.user.username) return true;
+    let newModalState = Object.assign({}, _init_modal);
+    newModalState.show = true;
+    newModalState.title = "Login First!";
+    newModalState.content = `You cannot rate your own movies...`;
+    setModal(newModalState);
+    return false;
+  }
+
+  const handleLikeRating = (e: any) => {
     setModal(_init_modal);
-    if (!checkIfLoggedIn()) return false;
+    if (!checkIfLoggedIn() || !checkIfTheUserIsTheSame()) return false;
+    
 
 
   };
 
   const handleHateRating = () => {
     setModal(_init_modal);
-    if (!checkIfLoggedIn()) return false;
-
-    
+    if (!checkIfLoggedIn() || !checkIfTheUserIsTheSame()) return false;
   };
 
   const togleModal = (): void => {
@@ -98,7 +107,9 @@ export default function MovieCard({
         </Card.Body>
         <Card.Footer>
           <Row xs={6} className="social-button-area justify-content-between">
-            <Col xs="auto">Created by: {username}</Col>
+            <Col xs="auto">
+              Created by: {username}
+            </Col>
             <Col xs="auto">{convertTimestampToData(created_at)}</Col>
           </Row>
         </Card.Footer>
