@@ -81,9 +81,9 @@ export default class Security {
 
             let token = '';
             if (rememberMeFlag) {
-                token = sign(contentData, process.env.JWT_TOP_SECRET);
+                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 604800 }); // A week
             } else {
-                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 7200 });
+                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 60 }); // 30 mins
             }
 
             const payload = decode(token) as JwtPayload;
@@ -92,17 +92,12 @@ export default class Security {
             const _model = new UserModel({ id: contentData.id });
             await _model.setNewUserToken(token);
 
-            if (!rememberMeFlag) {
-                content.data = { token, exp: payload.exp };
-                res.response = content;
+            content.data = { token, exp: payload.exp };
+            res.response = content;
 
-                const seconds: number = payload.exp - Math.round(Date.now() / 1000);
-                await _model.setExpirationToToken(seconds);
-            } else {
-                content.data = { token };
-                res.response = content;
-            }
-
+            const seconds: number = payload.exp - Math.round(Date.now() / 1000);
+            await _model.setExpirationToToken(seconds);
+    
             next();
         } catch (e) {
             console.log(e);

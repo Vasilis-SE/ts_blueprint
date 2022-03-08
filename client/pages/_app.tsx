@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/globals.css";
 import { useEffect, useState } from "react";
 import GlobalContext from "../context/globalContext";
-import LocalStorage from "../helpers/storage";
+import LocalStorageStore from "../helpers/storage";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [state, setState] = useState({ isLoggedIn: false, update });
@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
-    if(LocalStorage.getData('_token') && LocalStorage.getData('_user') )
+    if(LocalStorageStore.getData('_token') && LocalStorageStore.getData('_user') )
       setState({isLoggedIn: true, update});
   }, []);
 

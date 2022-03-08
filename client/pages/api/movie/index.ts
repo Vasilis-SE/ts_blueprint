@@ -1,29 +1,38 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  IFailedResponse,
-  ISuccessfulResponseData,
-} from "../../../interfaces/response";
+import { InvalidTokenProvided } from "../../../exceptions/authentication";
 import Fetch from "../../../helpers/fetch";
+import { mwCheckToken } from "../../../middleware/checkToken";
+import { mwDecipherToken } from "../../../middleware/decipherToken";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ISuccessfulResponseData | IFailedResponse>
+  res: NextApiResponse
 ) {
-  let response: ISuccessfulResponseData | IFailedResponse = {};
-
   switch (req.method) {
-    case "GET":
-      response = await getHandler();
+    case "GET": // Get list of movies
+      const response = await Fetch.get(
+        `${process.env.API_BASE_URL}/movie?page=0&limit=${process.env.RESULTS_LIMIT}&order=${process.env.MOVIES_ORDER_BY}&sort=${process.env.MOVIES_ORDER_METHOD}`
+      );
+
+      res.status(response.httpCode).json(response);
+      break;
+    case "POST": // Create new movie
+      try {
+        const dencryptedToken: string = await mwDecipherToken(req, res);
+        const response = await Fetch.post(
+          `${process.env.API_BASE_URL}/movie`,
+          {
+            Authorization: `JWT ${dencryptedToken}`,
+          }
+        );
+
+        // await mwCheckToken(response, res);
+        res.status(response.httpCode).json(response);
+      } catch (e) {
+        if (!(e instanceof InvalidTokenProvided)) throw e;
+        const response = { ...e };
+        return res.status(response.httpCode).json(response);
+      }
       break;
   }
-
-  res.status(response.httpCode).json(response);
 }
-
-const getHandler = async (): Promise<
-  ISuccessfulResponseData | IFailedResponse
-> => {
-  return await Fetch.get(
-    `${process.env.API_BASE_URL}/movie?page=0&limit=${process.env.RESULTS_LIMIT}&order=${process.env.MOVIES_ORDER_BY}&sort=${process.env.MOVIES_ORDER_METHOD}`
-  );
-};

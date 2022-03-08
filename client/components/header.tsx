@@ -4,7 +4,7 @@ import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import LoginModal from "./utils/loginModal";
 import GlobalContext from "../context/globalContext";
 import Fetch from "../helpers/fetch";
-import LocalStorage from "../helpers/storage";
+import LocalStorageStore from "../helpers/storage";
 import PopupModal from "./utils/notifyModal";
 import { INotifyModal } from "../interfaces/components";
 import { IGlobalContextProperties } from "../interfaces/contexts";
@@ -18,22 +18,22 @@ const Header: NextPage = () => {
 
   const logOutUser = async (): Promise<boolean> => {
     setModal(_init_modal);
-    const tokenPayload = await LocalStorage.getData('_token');
+    const tokenPayload = await LocalStorageStore.getData("_token");
     const response: any = await Fetch.delete("/api/user", {
       Authorization: tokenPayload,
     });
 
-    if(!response.status) {
-      let newModalState = Object.assign({}, _init_modal); 
-      newModalState.show = true;  
+    if (!response.status) {
+      let newModalState = Object.assign({}, _init_modal);
+      newModalState.show = true;
       newModalState.title = "Logout Error!";
       newModalState.content = response.message;
       setModal(newModalState);
       return false;
     }
 
-    LocalStorage.clearLocalStorage();
-    global.update({isLoggedIn: false, update: global.update})
+    LocalStorageStore.clearLocalStorage();
+    global.update({ isLoggedIn: false, update: global.update });
     return true;
   };
 
@@ -56,7 +56,7 @@ const Header: NextPage = () => {
         close={togleModal}
       ></PopupModal>
 
-      {global.isLoggedIn ? (
+      {!global.isLoggedIn ? (
         <LoginModal show={showLoginModal} close={togleModal}></LoginModal>
       ) : null}
 
@@ -69,12 +69,18 @@ const Header: NextPage = () => {
             {global.isLoggedIn ? (
               <Nav.Link href="#profile">Profile</Nav.Link>
             ) : null}
+
+            {global.isLoggedIn ? (
+              <Nav.Link href="/movies/add">Add New Movie</Nav.Link>
+            ) : null}
           </Nav>
         </Container>
 
         {global.isLoggedIn ? (
           <Container className="gap-1 justify-content-right">
-            <Button variant="outline-danger" onClick={logOutUser}>Logout</Button>
+            <Button variant="outline-danger" onClick={logOutUser}>
+              Logout
+            </Button>
           </Container>
         ) : (
           <Container className="gap-1 justify-content-right">

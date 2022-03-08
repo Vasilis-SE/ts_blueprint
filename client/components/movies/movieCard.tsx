@@ -33,11 +33,15 @@ export default function MovieCard({
   const handleLikeRating = () => {
     setModal(_init_modal);
     if (!checkIfLoggedIn()) return false;
+
+
   };
 
   const handleHateRating = () => {
     setModal(_init_modal);
     if (!checkIfLoggedIn()) return false;
+
+    
   };
 
   const togleModal = (): void => {

@@ -4,8 +4,9 @@ import Fetch from "../helpers/fetch";
 import { IUserLoginProperties } from "../interfaces/user";
 import { IErrorAlert } from "../interfaces/components";
 import ErrorAlter from "./utils/errorAlert";
-import LocalStorage from "../helpers/storage";
-import Router from "next/router";
+import LocalStorageStore from "../helpers/storage";
+import { IGlobalContextProperties } from "../interfaces/contexts";
+import GlobalContext from "../context/globalContext";
 
 export default function LoginForm() {
   const handleUsernameChange = (event: any) => {
@@ -47,12 +48,11 @@ export default function LoginForm() {
       });
     }
 
-    const tokenData = JSON.stringify(loginResponse.data);
 
     // If login was a success fetch profile
     let url = `/api/user${rememberMe ? "?rm=true" : ""}`;
     const profileResponse = await Fetch.get(url, {
-      Authorization: tokenData,
+      Authorization: JSON.stringify(loginResponse.data),
     });
 
     if (!profileResponse.status) {
@@ -64,8 +64,11 @@ export default function LoginForm() {
       });
     }
 
-    LocalStorage.setData(JSON.stringify(profileResponse.data), '_user');
-    LocalStorage.setData(tokenData, '_token');
+    const tokenData = {...loginResponse.data, exp: loginResponse.exp};
+    LocalStorageStore.setData(JSON.stringify(profileResponse.data), '_user');
+    LocalStorageStore.setData(JSON.stringify(tokenData), '_token');
+    global.update({isLoggedIn: true, update: global.update});
+    
     // Router.reload(); // Force reload
   };
 
@@ -73,6 +76,8 @@ export default function LoginForm() {
     title: "",
     content: "",
   };
+
+  const global: IGlobalContextProperties = React.useContext(GlobalContext);
 
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
