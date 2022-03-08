@@ -1,5 +1,13 @@
 import React from "react";
-import { Row, Col, Dropdown, Pagination } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Dropdown,
+  Pagination,
+  Badge,
+  Button,
+  Alert,
+} from "react-bootstrap";
 import Converter from "../../helpers/convert";
 import Fetch from "../../helpers/fetch";
 import { IRequestQueryFilters } from "../../interfaces/request";
@@ -26,10 +34,23 @@ export default function MoviesList() {
   const [movies, setMovies] = React.useState<any[]>([]);
   const [meta, setMeta] = React.useState(initMeta);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [author, setAuthor] = React.useState("");
   const [queryParams, setQueryParams] = React.useState(initQuery);
 
-  const handleMoviesResponse = async (path: string) => {
-    const data: any = await Fetch.get(path);
+  const handleMoviesResponse = async (pagination: string = '') => {
+    let url = '';
+    if(pagination == '') {
+      url = `/api/movie`;
+      if(author != '') url += `/${author}`;
+      url += `?${Converter.objectToQueryString(queryParams)}`;
+    } else if (pagination == '_prev') {
+      url = meta._prev;
+    } else {
+      url = meta._next;
+    }
+    
+    console.log(url);
+    const data: any = await Fetch.get(url);
     if (!data.status) return setErrorMessage(data.message);
 
     let moviesList = Array.isArray(data.data) ? data.data : [data.data];
@@ -38,32 +59,48 @@ export default function MoviesList() {
   };
 
   const handlePaginationPrev = async (e: any) => {
-    e.preventDefault();
     if (meta._prev === "") return;
     const clonedState = { ...queryParams };
     clonedState.page!--;
     setQueryParams({ ...clonedState });
-    handleMoviesResponse(meta._prev);
   };
 
   const handlePaginationNext = async (e: any) => {
-    e.preventDefault();
     if (meta._next === "") return;
     const clonedState = { ...queryParams };
     clonedState.page!++;
     setQueryParams({ ...clonedState });
-    handleMoviesResponse(meta._next);
   };
 
   const handleChangeOfOrdering = (order: string) => {
-    if(order === queryParams.order) return;
-
-    // Since the order changed, re-init the query params and call
-    // again for data.
-    const newState = {...initQuery};
+    if (order === queryParams.order) return;
+    const newState = { ...queryParams };
     newState.order = order;
+    newState.page = 0;
     setQueryParams(newState);
-    handleMoviesResponse(`/api/movie?${Converter.objectToQueryString(newState)}`);
+  };
+
+  const handleUserMovieFetch = async (e: any) => {
+    let author: string = e.target.value;
+    setAuthor(author);
+    const newState = { ...queryParams };
+    newState.page = 0;
+    setQueryParams(newState);
+  };
+
+  const handleSelectedAuthorRemoval = async () => {
+    setAuthor("");
+    const newState = { ...queryParams };
+    newState.page = 0;
+    setQueryParams(newState);
+  };
+
+  const handleChangeOfSorting = (sort: string) => {
+    if (queryParams.sort === sort) return;
+
+    const newState = { ...queryParams };
+    newState.sort = sort;
+    setQueryParams(newState);
   };
 
   React.useEffect(() => {
@@ -76,6 +113,10 @@ export default function MoviesList() {
       setFinished(true);
     }, 1000);
   }, []);
+
+  React.useEffect(() => {
+    handleMoviesResponse();
+  }, [queryParams]);
 
   const buildMovieList = () => {
     let cards = [];
@@ -92,6 +133,7 @@ export default function MoviesList() {
             likes={movie.likes ? movie.likes : 0}
             hates={movie.hates ? movie.hates : 0}
             created_at={movie.created_at}
+            handleUserMovieFetch={handleUserMovieFetch}
           ></MovieCard>
         </Col>
       );
@@ -104,33 +146,72 @@ export default function MoviesList() {
     return (
       <Row>
         <Col>
-          <Dropdown onSelect={handleChangeOfOrdering}>
-            <Dropdown.Toggle variant="outline-warning" id="dropdown-basic">
-              Order By
-            </Dropdown.Toggle>
+          <Row>
+            <Col md="auto">
+              <Dropdown onSelect={handleChangeOfOrdering}>
+                <Dropdown.Toggle variant="outline-warning" id="dropdown-basic">
+                  Order By
+                </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-              <Dropdown.Item
-                eventKey="likes"
-                active={queryParams.order == "likes"}
-              >
-                Order By Likes
-              </Dropdown.Item>
-              <Dropdown.Item
-                eventKey="hates"
-                active={queryParams.order == "hates"}
-              >
-                Order By Hates
-              </Dropdown.Item>
-              <Dropdown.Item
-                eventKey="created_at"
-                active={queryParams.order == "created_at"}
-              >
-                Order By Date
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    eventKey="likes"
+                    active={queryParams.order == "likes"}
+                  >
+                    Order By Likes
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    eventKey="hates"
+                    active={queryParams.order == "hates"}
+                  >
+                    Order By Hates
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    eventKey="created_at"
+                    active={queryParams.order == "created_at"}
+                  >
+                    Order By Date
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Col>
+
+            <Col md="auto">
+              <Dropdown onSelect={handleChangeOfSorting}>
+                <Dropdown.Toggle variant="outline-warning" id="dropdown-basic">
+                  Sort
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    eventKey="ASC"
+                    active={queryParams.sort == "ASC"}
+                  >
+                    Ascending
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    eventKey="DESC"
+                    active={queryParams.sort == "DESC"}
+                  >
+                    Descending
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Col>
+
+            {author != "" ? (
+              <Col md="auto">
+                <Button
+                  variant="outline-primary"
+                  onClick={handleSelectedAuthorRemoval}
+                >
+                  {author} <Badge bg="secondary"> X </Badge>
+                </Button>
+              </Col>
+            ) : null}
+          </Row>
         </Col>
+
         <Col>
           <Pagination className="justify-content-right">
             <Pagination.Prev
@@ -149,7 +230,9 @@ export default function MoviesList() {
 
   return finished ? (
     errorMessage != "" ? (
-      <Row> {errorMessage} </Row>
+      <Alert variant="danger">
+        <p>{errorMessage}</p>
+      </Alert>
     ) : (
       [buildBar(), buildMovieList()]
     )

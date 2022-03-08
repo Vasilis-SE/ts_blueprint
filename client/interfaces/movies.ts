@@ -8,6 +8,10 @@ export interface IMovieProperties {
     created_at?: number;
 }
 
+export interface IMovieCardProperties extends IMovieProperties {
+    handleUserMovieFetch: Function
+}
+
 export enum MovieGlobals {
     TITLE_MAXLENGTH = 40,
     QUERY_LENGTH = 10,

@@ -1,17 +1,17 @@
 import React from "react";
-import { Card, Row, Col, Button, Nav } from "react-bootstrap";
+import { Card, Row, Col, Button, Nav, Badge } from "react-bootstrap";
 import GlobalContext from "../../context/globalContext";
+import Converter from "../../helpers/convert";
 import Fetch from "../../helpers/fetch";
 import LocalStorageStore from "../../helpers/storage";
 import { INotifyModal } from "../../interfaces/components";
 import { IGlobalContextProperties } from "../../interfaces/contexts";
-import { IMovieProperties } from "../../interfaces/movies";
+import {
+  IMovieCardProperties,
+  IMovieProperties,
+} from "../../interfaces/movies";
 import { IRatePayload } from "../../interfaces/rating";
 import PopupModal from "../utils/notifyModal";
-
-const convertTimestampToData = (timestamp = 0) => {
-  return new Date(timestamp * 1000).toLocaleTimeString("el-GR");
-};
 
 export default function MovieCard({
   id,
@@ -21,7 +21,8 @@ export default function MovieCard({
   likes,
   hates,
   created_at,
-}: IMovieProperties) {
+  handleUserMovieFetch,
+}: IMovieCardProperties) {
   const checkIfLoggedIn = (): boolean => {
     if (global.isLoggedIn) return true;
     let newModalState = Object.assign({}, _init_modal);
@@ -37,7 +38,7 @@ export default function MovieCard({
     if (username != global.user.username) return true;
     let newModalState = Object.assign({}, _init_modal);
     newModalState.show = true;
-    newModalState.title = "Login First!";
+    newModalState.title = "Rate Error!";
     newModalState.content = `You cannot rate your own movies...`;
     setModal(newModalState);
     return false;
@@ -185,8 +186,19 @@ export default function MovieCard({
         </Card.Body>
         <Card.Footer>
           <Row xs={6} className="social-button-area justify-content-between">
-            <Col xs="auto">Created by: {movie.username}</Col>
-            <Col xs="auto">{convertTimestampToData(movie.created_at)}</Col>
+            <Col xs="auto">
+              Created by:{" "}
+              <button
+                className="pill"
+                value={movie.username}
+                onClick={handleUserMovieFetch}
+              >
+                {movie.username}
+              </button>
+            </Col>
+            <Col xs="auto">
+              {Converter.convertTimestampToData(movie.created_at)}
+            </Col>
           </Row>
         </Card.Footer>
       </Card>

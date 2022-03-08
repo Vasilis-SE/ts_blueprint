@@ -136,13 +136,13 @@ export default class MovieService {
 
             if (page) {
                 queryClonePrev.page--;
-                _prev = `${baseUrl}?${Object.keys(queryClonePrev)
+                _prev = `${baseUrl}${params.username ? `/${params.username}` : ''}?${Object.keys(queryClonePrev)
                     .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(queryClonePrev[k])}`).join('&')}`
             }
 
             if(offset < moviesCount) {
                 queryCloneNext.page++;
-                _next = `${baseUrl}?${Object.keys(queryCloneNext)
+                _next = `${baseUrl}${params.username ? `/${params.username}` : ''}?${Object.keys(queryCloneNext)
                     .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(queryCloneNext[k])}`).join('&')}`
             }
 
