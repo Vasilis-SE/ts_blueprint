@@ -14,6 +14,8 @@ import ErrorAlter from "../../components/utils/errorAlert";
 import { IMovieProperties } from "../../interfaces/movies";
 import Fetch from "../../helpers/fetch";
 import LocalStorageStore from "../../helpers/storage";
+import Header from "../../components/header";
+import Footer from "../../components/footer";
 
 const AddMovie: NextPage = () => {
   const handleTitleChange = (event: any) => {
@@ -58,9 +60,6 @@ const AddMovie: NextPage = () => {
       Authorization: tokenPayload,
     });
 
-    const d = new Date();
-    console.log("meta to response...", d.getMilliseconds());
-
     let newModalState = Object.assign({}, _init_modal);
     newModalState.show = true;
 
@@ -83,7 +82,6 @@ const AddMovie: NextPage = () => {
     setTitleError("");
     setDescriptionError("");
     setAlertError(_init_alert);
-    setModal(_init_modal);
   };
 
   const togleModal = (): void => {
@@ -121,6 +119,7 @@ const AddMovie: NextPage = () => {
         close={togleModal}
       ></PopupModal>
 
+      <Header></Header>
       <Container className="p-4">
         <Row xs={12} md={9} lg={7}>
           <section className="p-3">
@@ -193,6 +192,7 @@ const AddMovie: NextPage = () => {
           ""
         )}
       </Container>
+      <Footer></Footer>
     </>
   );
 };

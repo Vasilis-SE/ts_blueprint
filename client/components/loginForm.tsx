@@ -7,6 +7,7 @@ import ErrorAlter from "./utils/errorAlert";
 import LocalStorageStore from "../helpers/storage";
 import { IGlobalContextProperties } from "../interfaces/contexts";
 import GlobalContext from "../context/globalContext";
+import Router from "next/router";
 
 export default function LoginForm() {
   const handleUsernameChange = (event: any) => {
@@ -48,7 +49,6 @@ export default function LoginForm() {
       });
     }
 
-
     // If login was a success fetch profile
     let url = `/api/user${rememberMe ? "?rm=true" : ""}`;
     const profileResponse = await Fetch.get(url, {
@@ -67,8 +67,18 @@ export default function LoginForm() {
     const tokenData = {...loginResponse.data, exp: loginResponse.exp};
     LocalStorageStore.setData(JSON.stringify(profileResponse.data), '_user');
     LocalStorageStore.setData(JSON.stringify(tokenData), '_token');
-    global.update({isLoggedIn: true, update: global.update});
-    
+    global.update({
+      isLoggedIn: true, 
+      exp: loginResponse.exp,
+      user: profileResponse.data,
+      update: global.update
+    });
+
+    // console.log(loginResponse.exp - Math.floor(Date.now() / 1000));
+    // setTimeout(() => {
+    //   LocalStorageStore.clearLocalStorage();
+    //   Router.push('/');
+    // }, (loginResponse.exp - Math.floor(Date.now() / 1000)))
     // Router.reload(); // Force reload
   };
 

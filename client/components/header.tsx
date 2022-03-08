@@ -62,9 +62,9 @@ const Header: NextPage = () => {
 
       <Navbar bg="light" variant="light">
         <Container>
-          <Navbar.Brand href="#home">MovieRama</Navbar.Brand>
+          <Navbar.Brand href="/">MovieRama</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="/">Home</Nav.Link>
 
             {global.isLoggedIn ? (
               <Nav.Link href="#profile">Profile</Nav.Link>

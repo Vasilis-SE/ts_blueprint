@@ -83,7 +83,7 @@ export default class Security {
             if (rememberMeFlag) {
                 token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 604800 }); // A week
             } else {
-                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 60 }); // 30 mins
+                token = sign(contentData, process.env.JWT_TOP_SECRET, { expiresIn: 3600 }); // 1 hour
             }
 
             const payload = decode(token) as JwtPayload;

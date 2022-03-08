@@ -8,6 +8,12 @@ export interface IUserLoginProperties {
     password: string;
 }
 
+export interface IUserStorage {
+    username: string;
+    password: string;
+    created_at: number;
+}
+
 export interface IGlobalStateProperties {
     isLoggedIn: boolean;
 }

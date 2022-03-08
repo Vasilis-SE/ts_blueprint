@@ -21,12 +21,16 @@ export default async function handler(
         const dencryptedToken: string = await mwDecipherToken(req, res);
         const response = await Fetch.post(
           `${process.env.API_BASE_URL}/movie`,
+          JSON.parse(req.body),
           {
             Authorization: `JWT ${dencryptedToken}`,
+            "Content-Type": "application/json"
           }
         );
 
-        // await mwCheckToken(response, res);
+        console.log(JSON.parse(req.body))
+        console.log(response)
+
         res.status(response.httpCode).json(response);
       } catch (e) {
         if (!(e instanceof InvalidTokenProvided)) throw e;
