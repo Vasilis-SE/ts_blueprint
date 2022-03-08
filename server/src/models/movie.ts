@@ -51,7 +51,7 @@ export default class MovieModel implements IMovie {
             const wherePart = filters.where && filters.where != '' 
                 ? filters.where
                 : ObjectHandler.objectToSQLParams(resource, ' AND ');
-        
+
             const query = await PostgreSQL.client.query(`SELECT 
                 ${filters.fields ? filters.fields.join(', ') : '*'}
                 FROM movies 

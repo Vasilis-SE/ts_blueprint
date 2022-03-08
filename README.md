@@ -79,6 +79,18 @@
     <li> 
         On /server folder of the project run <code>npm run api:dev</code> to run restAPI.
     </li>
+    <li> 
+        Go to client folder and execute <code>npm init</code>, to initialize the frontend's 
+        project and to install all dependencies.
+    </li>
+    <li> 
+        Type <code>npm run dev</code>, to run the develoment environment of the client side.
+        If all goes well you will be prompted with a URL link to run in on your browser.
+        e.g. <code>http://localhost:5100</code>
+    </li>
+    <li> 
+        You are good to go, venture into the app and test its functionalities!!!
+    </li>
 </ol>
 
 ## Future Updates/Tweaks

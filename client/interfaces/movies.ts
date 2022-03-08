@@ -8,4 +8,11 @@ export interface IMovieProperties {
     created_at?: number;
 }
 
+export enum MovieGlobals {
+    TITLE_MAXLENGTH = 40,
+    QUERY_LENGTH = 10,
+    QUERY_ORDER_FIELD = 'id',
+    QUERY_SORT_METHOD = 'ASC',
+}
+
 export type IListOfMovies = Array<IMovieProperties>;

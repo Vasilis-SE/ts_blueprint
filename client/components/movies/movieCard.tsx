@@ -65,7 +65,7 @@ export default function MovieCard({
       return false;
     }
 
-    let newState = {...movie};
+    let newState = { ...movie };
     switch (rateResponse.proc) {
       case "add":
         newState.likes++;
@@ -79,7 +79,7 @@ export default function MovieCard({
         break;
     }
 
-    setMovie({...newState})
+    setMovie({ ...newState });
   };
 
   const handleHateRating = async () => {
@@ -104,7 +104,7 @@ export default function MovieCard({
       return false;
     }
 
-    let newState = {...movie};
+    let newState = { ...movie };
     switch (rateResponse.proc) {
       case "add":
         newState.hates++;
@@ -118,7 +118,7 @@ export default function MovieCard({
         break;
     }
 
-    setMovie({...newState})
+    setMovie({ ...newState });
   };
 
   const togleModal = (): void => {

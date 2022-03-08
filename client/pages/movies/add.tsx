@@ -11,7 +11,7 @@ import { NextPage } from "next";
 import { IErrorAlert, INotifyModal } from "../../interfaces/components";
 import PopupModal from "../../components/utils/notifyModal";
 import ErrorAlter from "../../components/utils/errorAlert";
-import { IMovieProperties } from "../../interfaces/movies";
+import { IMovieProperties, MovieGlobals } from "../../interfaces/movies";
 import Fetch from "../../helpers/fetch";
 import LocalStorageStore from "../../helpers/storage";
 import Header from "../../components/header";
@@ -42,11 +42,11 @@ const AddMovie: NextPage = () => {
 
     if (title == "" || description == "") return;
 
-    if (title.length > 40) {
+    if (title.length > MovieGlobals.TITLE_MAXLENGTH) {
       return setAlertError({
         title: "Form Error!",
         content: `The length of the title input is to long. 
-            Try a title with less than 40 letters...`,
+            Try a title with less than ${MovieGlobals.TITLE_MAXLENGTH} letters...`,
       });
     }
 

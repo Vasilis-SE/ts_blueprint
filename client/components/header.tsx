@@ -65,11 +65,6 @@ const Header: NextPage = () => {
           <Navbar.Brand href="/">MovieRama</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>
-
-            {global.isLoggedIn ? (
-              <Nav.Link href="#profile">Profile</Nav.Link>
-            ) : null}
-
             {global.isLoggedIn ? (
               <Nav.Link href="/movies/add">Add New Movie</Nav.Link>
             ) : null}
@@ -78,6 +73,7 @@ const Header: NextPage = () => {
 
         {global.isLoggedIn ? (
           <Container className="gap-1 justify-content-right">
+            <span className='text-muted'>{global.user.username}</span>
             <Button variant="outline-danger" onClick={logOutUser}>
               Logout
             </Button>
