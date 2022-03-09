@@ -38,7 +38,7 @@
     <li> Redis -> For caching JWT. </li>
     <li> Gulp -> For building the backend API code. </li>
     <li> ESLint -> For linting the backend code. </li>
-    <li> redisinsight -> Tool to display stored Redis keys. </li>
+    <li> redisinsight -> Tool to display stored Redis keys (it will be installed throught docker but you are not required to use it). </li>
 </ol>
 
 ## Installation 
