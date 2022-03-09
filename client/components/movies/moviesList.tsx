@@ -49,7 +49,6 @@ export default function MoviesList() {
       url = meta._next;
     }
     
-    console.log(url);
     const data: any = await Fetch.get(url);
     if (!data.status) return setErrorMessage(data.message);
 

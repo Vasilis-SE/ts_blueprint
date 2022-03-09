@@ -5,6 +5,12 @@
     can add their own like/dislike others and view them. 
 </p>
 
+<p>
+    You can view a step by step guide on how to install and run the app
+    below. Also you can view all the steps made the tasks on Github's 
+    repository <code>Projects</code> tab (<code>https://github.com/Vasilis-SE/MovieRama/projects/1</code>).
+</p>
+
 ## Technologies 
 
 <p>

@@ -1,13 +1,19 @@
 import React from "react";
 import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import { NextPage } from "next";
-import {IUserRegisterProperties} from "../interfaces/user";
+import { IUserRegisterProperties } from "../interfaces/user";
 import ErrorAlter from "../components/utils/errorAlert";
 import Fetch from "../helpers/fetch";
 import PopupModal from "../components/utils/notifyModal";
 import { IErrorAlert, INotifyModal } from "../interfaces/components";
+import { IGlobalContextProperties } from "../interfaces/contexts";
+import GlobalContext from "../context/globalContext";
+import Router from "next/router";
+import LocalStorageStore from "../helpers/storage";
 
 const Register: NextPage = () => {
+  const global: IGlobalContextProperties = React.useContext(GlobalContext);
+
   const handleUsernameChange = (event: any) => {
     setUsername(event.target.value);
     setUsernameError("");
@@ -61,15 +67,15 @@ const Register: NextPage = () => {
 
     const payload: IUserRegisterProperties = { username, password };
     const response: any = await Fetch.post("/api/user", payload);
-    let newModalState = Object.assign({}, _init_modal); 
+    let newModalState = Object.assign({}, _init_modal);
     newModalState.show = true;
 
     // If error display error message
-    if(!response.status) {
-        newModalState.title = "Registration error!";
-        newModalState.content = response.message;
-        return setModal(newModalState);
-    } 
+    if (!response.status) {
+      newModalState.title = "Registration error!";
+      newModalState.content = response.message;
+      return setModal(newModalState);
+    }
 
     // Else print success
     newModalState.title = "Registration success!";
@@ -92,8 +98,8 @@ const Register: NextPage = () => {
   };
 
   const _init_alert: IErrorAlert = {
-      title: "",
-      content: ""
+    title: "",
+    content: "",
   };
 
   const [username, setUsername] = React.useState("");
@@ -106,7 +112,16 @@ const Register: NextPage = () => {
   const [alertError, setAlertError] = React.useState<any>(_init_alert);
   const [modal, setModal] = React.useState<any>(_init_modal);
 
-  return (
+  React.useEffect(() => {
+    if (
+      LocalStorageStore.getData("_token") ||
+      LocalStorageStore.getData("_user")
+    ) {
+      Router.push("/");
+    }
+  }, []);
+
+  return !global.isLoggedIn ? (
     <>
       <PopupModal
         show={modal.show}
@@ -191,7 +206,7 @@ const Register: NextPage = () => {
         )}
       </Container>
     </>
-  );
+  ) : null;
 };
 
 export default Register;

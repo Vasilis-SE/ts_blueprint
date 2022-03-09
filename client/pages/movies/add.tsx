@@ -16,8 +16,14 @@ import Fetch from "../../helpers/fetch";
 import LocalStorageStore from "../../helpers/storage";
 import Header from "../../components/header";
 import Footer from "../../components/footer";
+import { IGlobalContextProperties } from "../../interfaces/contexts";
+import GlobalContext from "../../context/globalContext";
+// import Router from "next/router";
+import { useRouter } from "next/router";
 
 const AddMovie: NextPage = () => {
+  const router = useRouter();
+
   const handleTitleChange = (event: any) => {
     setTitle(event.target.value);
     setTitleError("");
@@ -102,6 +108,7 @@ const AddMovie: NextPage = () => {
     content: "",
   };
 
+  const global: IGlobalContextProperties = React.useContext(GlobalContext);
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [titleError, setTitleError] = React.useState("");
@@ -110,7 +117,16 @@ const AddMovie: NextPage = () => {
   const [alertError, setAlertError] = React.useState<any>(_init_alert);
   const [modal, setModal] = React.useState<any>(_init_modal);
 
-  return (
+  React.useEffect(() => {
+    if (
+      !LocalStorageStore.getData("_token") &&
+      !LocalStorageStore.getData("_user")
+    ) {
+      router.push("/");
+    }
+  }, []);
+
+  return global.isLoggedIn ? (
     <>
       <PopupModal
         show={modal.show}
@@ -194,7 +210,7 @@ const AddMovie: NextPage = () => {
       </Container>
       <Footer></Footer>
     </>
-  );
+  ) : null;
 };
 
 export default AddMovie;
