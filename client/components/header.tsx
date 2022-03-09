@@ -23,14 +23,18 @@ const Header: NextPage = () => {
       Authorization: tokenPayload,
     });
 
-    if (!response.status) {
+    // ES2 error code mean that the token is invalid. When you login each token is set
+    // an expiration time. When a user tries to communicate with an endpoint the JWT
+    // might have died before that call hence the es2 error. In those cases just kill the stored
+    // token in the clients side and continue on.
+    if (!response.status && response.errorCode !== "es2") {
       let newModalState = Object.assign({}, _init_modal);
       newModalState.show = true;
       newModalState.title = "Logout Error!";
       newModalState.content = response.message;
       setModal(newModalState);
       return false;
-    }
+    } 
 
     LocalStorageStore.clearLocalStorage();
     global.update({ isLoggedIn: false, update: global.update });

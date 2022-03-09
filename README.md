@@ -15,6 +15,11 @@
     Also all the Postman request to the API are provider in the folder <code>postman</code> in /server/postman.
 </p>
 
+<p>
+    At client side of the application the movies are displayed with pagination and chunks of 4 movies per page.
+    The chunk size was set too low just to demonstrate the pagination functionalities.
+</p>
+
 ## Technologies 
 
 <p>
@@ -24,10 +29,15 @@
 <ol>
     <li> NodeJS </li>
     <li> Typescipt </li>
+    <li> ExpressJS -> Framework for the RestAPI, to handle requests and send responses. </li>
+    <li> NextJS -> The framework that the client side is created upon. </li>
+    <li> Jason Web Token (JWT) -> It is used for the authentication of users. </li>
     <li> Docker -> For dockerizing the app and install all the necessary tooling. </li>
     <li> PostgreSQL -> The database. </li>
     <li> PgAdmin -> Display database tool. </li>
-    <li> Redis -> For caching. </li>
+    <li> Redis -> For caching JWT. </li>
+    <li> Gulp -> For building the backend API code. </li>
+    <li> ESLint -> For linting the backend code. </li>
     <li> redisinsight -> Tool to display stored Redis keys. </li>
 </ol>
 
