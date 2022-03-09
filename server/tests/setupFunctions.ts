@@ -1,2 +1,2 @@
-import PostgreSQL from '../src/connections/postgres';
-
+// import PostgreSQL from '../src/connections/postgres';
+// PostgreSQL.init();

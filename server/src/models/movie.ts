@@ -76,7 +76,7 @@ export default class MovieModel implements IMovie {
             
             const query = await PostgreSQL.client.query(queryString, [this.getTitle(), 
                 this.getDescription(), this.getUsername(), this.getCreatedAtStamp()]);
-            if (query.rowCount === 0) throw Error();
+                if (query.rowCount === 0) throw Error();
 
             // Set the newly created id
             this.setId(query.rows[0].id);

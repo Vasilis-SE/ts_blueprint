@@ -6,6 +6,11 @@
 </p>
 
 <p>
+    You can run all the unit tests of the backend code simply by going into
+    /server and typing <code>npm run test</code>
+</p>
+
+<p>
     You can view a step by step guide on how to install and run the app
     below. Also you can view all the steps made the tasks on Github's 
     repository <code>Projects</code> tab (<code>https://github.com/Vasilis-SE/MovieRama/projects/1</code>).
@@ -31,6 +36,7 @@
     <li> Typescipt </li>
     <li> ExpressJS -> Framework for the RestAPI, to handle requests and send responses. </li>
     <li> NextJS -> The framework that the client side is created upon. </li>
+    <li> Jest -> Testing framework of NodeJS. </li>
     <li> Jason Web Token (JWT) -> It is used for the authentication of users. </li>
     <li> Docker -> For dockerizing the app and install all the necessary tooling. </li>
     <li> PostgreSQL -> The database. </li>
