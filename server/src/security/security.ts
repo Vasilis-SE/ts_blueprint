@@ -71,7 +71,8 @@ export default class Security {
 
     async generateUserToken(req: InjectedRequest, res: InjectedResponse, next: NextFunction) {
         try {
-            if (!('response' in res) || !res.response.status) throw Error();
+            if (!('response' in res) || !res.response.status) 
+                throw new Error();
 
             const content: ISuccessfulResponse = res.response;
             const contentData: ISuccessfulResponseData = content.data;
@@ -100,7 +101,6 @@ export default class Security {
     
             next();
         } catch (e) {
-            console.log(e);
             next();
         }
     }

@@ -11,14 +11,17 @@ export default async function handler(
     case "POST": // login
       const response = await Fetch.post(
         `${process.env.API_BASE_URL}/user/login`,
-        JSON.parse(req.body),
+        req.body,
         {
           "Content-Type": "application/json",
         }
       );
 
-      if (!response.status) return response;
-      if (!process.env.STORAGE_AES_KEY) return { status: false };
+      if (!response.status) 
+        return res.status(response.httpCode).json(response);
+      
+      if (!process.env.STORAGE_AES_KEY) 
+        return res.status(500).json({ status: false });
 
       // If login is successfull cipher token to keep data on local storage.
       // The token is ciphered here because enviromentals here on the back are

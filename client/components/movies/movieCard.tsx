@@ -161,7 +161,7 @@ export default function MovieCard({
         <Card.Body>
           <Card.Title>{movie.title}</Card.Title>
           <Card.Text className="movie-card-discription">
-            {movie.description}
+            { movie.description.replace(/\\/g, '') }
           </Card.Text>
           <Row xs={6} className="social-button-area justify-content-between">
             <Col xs="auto">

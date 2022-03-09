@@ -30,9 +30,12 @@ const bodyParser = __importStar(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const router_1 = __importDefault(require("../routes/router"));
+const passport_1 = __importDefault(require("passport"));
 class Server {
     constructor() {
         this._app = (0, express_1.default)();
+        this._routes = new router_1.default();
         this.config();
     }
     run(port, callback) {
@@ -45,6 +48,8 @@ class Server {
         this._app.use(bodyParser.urlencoded({ extended: true }));
         this._app.use((0, cors_1.default)());
         this._app.use((0, helmet_1.default)());
+        this._app.use(passport_1.default.initialize());
+        this._app.use('/api', this._routes.getAppRoutes());
         this._app.use((req, res) => {
             res.status(404).send({ url: `${req.originalUrl} not found` });
         });

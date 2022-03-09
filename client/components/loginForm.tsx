@@ -39,7 +39,9 @@ export default function LoginForm() {
     };
 
     // Attempt login user
-    const loginResponse = await Fetch.post("/api/user/login", payload);
+    const loginResponse = await Fetch.post("/api/user/login", payload, {
+      "Content-Type": "application/json",
+    });
     if (!loginResponse.status) {
       return setAlertError({
         title: "Login Error!",
@@ -64,14 +66,14 @@ export default function LoginForm() {
       });
     }
 
-    const tokenData = {...loginResponse.data, exp: loginResponse.exp};
-    LocalStorageStore.setData(JSON.stringify(profileResponse.data), '_user');
-    LocalStorageStore.setData(JSON.stringify(tokenData), '_token');
+    const tokenData = { ...loginResponse.data, exp: loginResponse.exp };
+    LocalStorageStore.setData(JSON.stringify(profileResponse.data), "_user");
+    LocalStorageStore.setData(JSON.stringify(tokenData), "_token");
     global.update({
-      isLoggedIn: true, 
+      isLoggedIn: true,
       exp: loginResponse.exp,
       user: profileResponse.data,
-      update: global.update
+      update: global.update,
     });
 
     // console.log(loginResponse.exp - Math.floor(Date.now() / 1000));

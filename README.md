@@ -11,6 +11,10 @@
     repository <code>Projects</code> tab (<code>https://github.com/Vasilis-SE/MovieRama/projects/1</code>).
 </p>
 
+<p>
+    Also all the Postman request to the API are provider in the folder <code>postman</code> in /server/postman.
+</p>
+
 ## Technologies 
 
 <p>
@@ -48,7 +52,7 @@
     </li>
     <li> 
         To be on the same page and use exactly the same technologies, 
-        databased and tooling, docker is needed for setting up the project. 
+        database and tooling, docker is needed for setting up the project. 
         So you will need to download it and install it from 
         <a href="https://docs.docker.com/get-docker/"> here </a>.
     </li>
@@ -62,7 +66,7 @@
     </li>
     <li> 
         Next you will need to import the database schema is located on 
-        /database/schema folder. To do that, after the container is up and running
+        /server/database/schema folder. To do that, after the container is up and running
         (you will see it on docker user interface) open up a browser and type
         <code>localhost:8080</code> The port <code>8080</code> is the outbound
         port that the local machine is using to communicate with the images VM port
@@ -86,7 +90,7 @@
         On /server folder of the project run <code>npm run api:dev</code> to run restAPI.
     </li>
     <li> 
-        Go to client folder and execute <code>npm init</code>, to initialize the frontend's 
+        Go to /client folder and execute <code>npm init</code>, to initialize the frontend's 
         project and to install all dependencies.
     </li>
     <li> 
