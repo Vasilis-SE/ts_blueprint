@@ -20,15 +20,7 @@ export interface IUser extends IUserProperties {
 export enum UserGlobals {
     USERNAME_MAXLENGTH = 30,
     PASSWORD_MINLENGTH = 6,
-    QUERY_LENGTH = 10,
-    QUERY_ORDER_FIELD = 'id',
-    QUERY_SORT_METHOD = 'ASC',
-}
-
-export interface IUserFilters {
-    fields?: Array<string>; // Fields are used on queries to fetch specific fields
-    orderby?: string; // Order by for the query
-    limit?: string; // Limit for the query
+    QUERY_LENGTH = 10
 }
 
 export type IListOfUsers = Array<IUserProperties>;

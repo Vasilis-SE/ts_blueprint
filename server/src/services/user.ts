@@ -4,18 +4,19 @@ import {
     ContainsInvalidChars,
     ExcessiveBodyProperties,
     InputExceedMaxLimit,
-    InvalidParameterType,
     InvalidPassword,
     InvalidPropertyType,
     PasswordIsWeak,
     PropertyIsMissing,
 } from '../exceptions/validation';
+import Filters from '../helpers/filters';
 import { HttpCodes } from '../helpers/httpCodesEnum';
 import ObjectHandler from '../helpers/objectHandler';
 import Validator from '../helpers/validator';
 import { IRequestQueryFilters } from '../interfaces/express';
+import { ISQLFilters } from '../interfaces/filters';
 import { IFailedResponse, ISuccessfulResponse } from '../interfaces/response';
-import { IListOfUsers, IUserFilters, IUserProperties, UserGlobals } from '../interfaces/user';
+import { IListOfUsers, IUserProperties, UserGlobals } from '../interfaces/user';
 import UserModel from '../models/user';
 import Password from '../security/password';
 
@@ -30,7 +31,8 @@ export default class UserService {
             if (typeof payload.username !== 'string') throw new InvalidPropertyType('', 'string', 'username');
             if (typeof payload.password !== 'string') throw new InvalidPropertyType('', 'string', 'password');
 
-            if (Validator.hasSpecialCharacters(payload.username, '_ALL')) throw new ContainsInvalidChars('', 'username');
+            if (Validator.hasSpecialCharacters(payload.username, '_ALL'))
+                throw new ContainsInvalidChars('', 'username');
             if (payload.username.length > UserGlobals.USERNAME_MAXLENGTH) throw new InputExceedMaxLimit('', 'username');
 
             // Check if password is strong & hash it
@@ -84,7 +86,7 @@ export default class UserService {
         filters: IRequestQueryFilters,
     ): Promise<ISuccessfulResponse | IFailedResponse> {
         try {
-            const finalFilters: IUserFilters = await this._getUserFilters(filters);
+            const finalFilters: ISQLFilters = Filters._sqlFilters(filters);
             const _model = new UserModel(user);
 
             finalFilters.fields = ['id', 'username', 'created_at'];
@@ -122,7 +124,7 @@ export default class UserService {
             const _model = new UserModel();
             _model.setUsername(payload.username);
             const filters: IRequestQueryFilters = { limit: 1 };
-            const foundUserResults: any = await _model.getUsers(this._getUserFilters(filters));
+            const foundUserResults: any = await _model.getUsers(Filters._sqlFilters(filters));
             if (!foundUserResults) throw new CouldNotFindUser();
 
             _model.setId(foundUserResults[0].id);
@@ -156,8 +158,7 @@ export default class UserService {
     async logoutUser(user: IUserProperties, token: string): Promise<ISuccessfulResponse | IFailedResponse> {
         try {
             const _model = new UserModel(user);
-            if(!await _model.deleteUserToken(token))
-                throw new UnableToLogout();
+            if (!(await _model.deleteUserToken(token))) throw new UnableToLogout();
 
             const response: ISuccessfulResponse = {
                 status: true,
@@ -166,46 +167,11 @@ export default class UserService {
             };
             return response;
         } catch (e) {
-            if (!(e instanceof ExcessiveBodyProperties))
-                throw e;
+            if (!(e instanceof ExcessiveBodyProperties)) throw e;
 
             const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
             const error: IFailedResponse = errorResource;
             return error;
         }
-    }
-
-
-    /**
-     * Protected class function of UserService that is used to clear and gather all the
-     * filter data needed. Filters are used for managing queries on database. For example
-     * ordering a query, calculating the 'chunk' of data to return for pagination etc.
-     * @param filters Object of IRequestQueryFilters interface that contains the filters.
-     * @returns Object of IUserFilters interface which contains the final filters a query will use.
-     */
-    public _getUserFilters(filters: IRequestQueryFilters): IUserFilters {
-        const final: IUserFilters = {};
-
-        // Set order by filter
-        final.orderby = `${UserGlobals.QUERY_ORDER_FIELD} ${UserGlobals.QUERY_SORT_METHOD}`;
-        if ('order' in filters && filters.order && 'sort' in filters && filters.sort)
-            final.orderby = `${filters.order} ${filters.sort}`;
-
-        let page = 0;
-        if ('page' in filters && filters.page) {
-            if (!Validator.isNumber(filters.page.toString())) throw new InvalidParameterType('', 'page', 'number');
-            page = Number(filters.page);
-        }
-
-        let limit = UserGlobals.QUERY_LENGTH;
-        if ('limit' in filters && filters.limit) {
-            if (!Validator.isNumber(filters.limit.toString())) throw new InvalidParameterType('', 'limit', 'number');
-            limit = Number(filters.limit);
-        }
-
-        const offset = page * limit;
-        final.limit = `${limit} OFFSET ${offset}`;
-
-        return final;
     }
 }

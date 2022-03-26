@@ -1,7 +1,8 @@
 import PostgreSQL from '../connections/postgres';
 import RedisClient from '../connections/redis';
 import ObjectHandler from '../helpers/objectHandler';
-import { IListOfUsers, IUser, IUserFilters, IUserProperties } from '../interfaces/user';
+import { ISQLFilters } from '../interfaces/filters';
+import { IListOfUsers, IUser, IUserProperties } from '../interfaces/user';
 
 export default class UserModel implements IUser {
     id!: number;
@@ -20,7 +21,7 @@ export default class UserModel implements IUser {
         this.setCreatedAtStamp(user.created_at ? user.created_at : 0);
     }
 
-    async getUsers(filters: IUserFilters = {}): Promise<IListOfUsers | boolean> {
+    async getUsers(filters: ISQLFilters = {}): Promise<IListOfUsers | boolean> {
         try {
             let results: IListOfUsers = [];
             const resource = ObjectHandler.getResource(this);

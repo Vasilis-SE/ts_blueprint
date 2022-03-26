@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "movierama_server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -55,6 +55,7 @@
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.3",
-    "redis": "^4.0.4"
+    "redis": "^4.0.4",
+    "sequelize": "^6.17.0"
   }
 }

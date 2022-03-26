@@ -126,19 +126,3 @@
     development process and the task that were created, issues and so on are located on
     <a href="https://github.com/Vasilis-SE/MovieRama/projects/1" target="_blank"> Github's Project Panel </a>
 </p>
-
-## Preview
-
-<div>
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20172850.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20172728.png" style="width:300px; float:left;">  
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20172803.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20182211.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20182313.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20182224.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20174223.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20175612.png" style="width:300px; float:left;">
-  <img src="https://raw.githubusercontent.com/Vasilis-SE/MovieRama/main/images/Screenshot%202022-03-09%20172630.png" style="width:300px; float:left;">
-</div>
-
-
