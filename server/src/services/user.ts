@@ -21,6 +21,7 @@ import UserModel from '../models/user';
 import Password from '../security/password';
 
 export default class UserService {
+    
     async createUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {
         try {
             const validProperties = ['username', 'password'];

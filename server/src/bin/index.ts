@@ -3,7 +3,7 @@ import PostgreSQL from '../connections/postgres';
 import RedisClient from '../connections/redis';
 
 // Load enviromentals
-require('../bin/env');
+require('./env');
 
 // Initialize connections
 PostgreSQL.init();
