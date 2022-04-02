@@ -1,8 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, Column, OneToOne } from "typeorm";
+import { Movie } from './movie'; 
 
 @Entity()
-export class User {
-    @PrimaryGeneratedColumn()
+export class MovieInfo {
+    @OneToOne(() => Movie, (movie) => movie.id, {
+        nullable: false,
+        onDelete: 'CASCADE'
+    })
     movieid: number
 
     @Column()

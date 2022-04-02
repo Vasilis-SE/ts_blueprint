@@ -1,11 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { User } from './user';
 
 @Entity()
-export class User {
+export class Movie {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @ManyToOne(() => User, (user) => user.id, {
+        nullable: false,
+        onDelete: 'CASCADE'
+    })
     userid: number
 
     @Column()

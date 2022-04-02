@@ -1,11 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, Column, ManyToOne } from "typeorm"
+import { Movie } from './movie'; 
+import { User } from './user';
 
 @Entity()
-export class User {
-    @PrimaryGeneratedColumn()
+export class Rate {
+    @ManyToOne(() => Movie, (movie) => movie.id, {
+        nullable: false,
+        onDelete: 'CASCADE'
+    })
     movieid: number
 
-    @Column()
+    @ManyToOne(() => User, (user) => user.id, {
+        nullable: false,
+        onDelete: 'CASCADE'
+    })
     userid: number
 
     @Column()
