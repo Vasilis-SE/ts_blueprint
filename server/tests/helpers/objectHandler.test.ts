@@ -1,6 +1,6 @@
 import ObjectHandler from '../../src/helpers/objectHandler';
 import { IListOfUsers, IUserProperties } from '../../src/interfaces/user';
-import UserModel from '../../src/models/user';
+import UserModel from '../../src/repositories/user';
 const fs = require('fs');
 
 let users: IListOfUsers = [];

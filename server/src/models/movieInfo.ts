@@ -6,8 +6,8 @@ export class User {
     movieid: number
 
     @Column()
-    userid: number
+    title: string
 
     @Column()
-    rating: boolean
+    description: string
 }

@@ -17,7 +17,7 @@ import { IRequestQueryFilters } from '../interfaces/express';
 import { ISQLFilters } from '../interfaces/filters';
 import { IFailedResponse, ISuccessfulResponse } from '../interfaces/response';
 import { IListOfUsers, IUserProperties, UserGlobals } from '../interfaces/user';
-import UserModel from '../models/user';
+import UserModel from '../repositories/user';
 import Password from '../security/password';
 
 export default class UserService {

@@ -6,7 +6,7 @@ import { NextFunction } from 'express';
 import { IFailedResponse, ISuccessfulResponse, ISuccessfulResponseData } from '../interfaces/response';
 import { InvalidTokenProvided } from '../exceptions/security';
 import ObjectHandler from '../helpers/objectHandler';
-import UserModel from '../models/user';
+import UserModel from '../repositories/user';
 import { CouldNotFindUser } from '../exceptions/user';
 
 // Load enviromentals

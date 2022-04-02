@@ -6,7 +6,7 @@ import Validator from "../helpers/validator";
 import { IRequestQueryFilters } from "../interfaces/express";
 import { IMovieFilters, IMovieProperties, IMovieUrlParameters, MovieGlobals } from "../interfaces/movie";
 import { IFailedResponse, IMetaProperties, ISuccessfulResponse } from "../interfaces/response";
-import MovieModel from "../models/movie";
+import MovieModel from "../repositories/movie";
 
 export default class MovieService { 
 

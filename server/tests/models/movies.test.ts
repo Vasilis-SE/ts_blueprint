@@ -1,5 +1,5 @@
 import { IListOfMovies } from "../../src/interfaces/movie";
-import MovieModel from "../../src/models/movie";
+import MovieModel from "../../src/repositories/movie";
 import PostgreSQL from '../../src/connections/postgres';
 const fs = require('fs');
 

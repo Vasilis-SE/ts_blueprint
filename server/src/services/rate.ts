@@ -9,8 +9,8 @@ import { IMovieProperties } from "../interfaces/movie";
 import { IRateFilters, IRateProperties, RateGlobals } from "../interfaces/rate";
 import { IFailedResponse, ISuccessfulResponse } from "../interfaces/response";
 import { IUserProperties } from "../interfaces/user";
-import MovieModel from "../models/movie";
-import RateModel from "../models/rate";
+import MovieModel from "../repositories/movie";
+import RateModel from "../repositories/rate";
 
 export default class RateService {
 
