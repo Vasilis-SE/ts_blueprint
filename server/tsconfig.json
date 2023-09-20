@@ -1,22 +1,15 @@
 {
-  "compilerOptions": {
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "allowJs": true,
-    "types": ["jest", "node", "@types/jest"],    
-    "typeRoots": [
-      "./src/types"
-    ],    
-  },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "./src/**/*",
-    "tests"
-  ]
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "target": "ES6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "allowJs": true,
+        "types": ["jest", "node", "@types/jest"],
+        "typeRoots": ["./src/types"]
+    },
+    "exclude": ["node_modules"],
+    "include": ["./src/**/*", "tests"]
 }
