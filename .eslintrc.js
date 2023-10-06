@@ -9,6 +9,12 @@ module.exports = {
         'plugin:prettier/recommended', // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
     ],
     rules: {
-        '@typescript-eslint/no-var-requires': 0,    
+        '@typescript-eslint/no-var-requires': 0,
+        'prettier/prettier': [
+            'error',
+            {
+                endOfLine: 'auto',
+            },
+        ],
     },
 };

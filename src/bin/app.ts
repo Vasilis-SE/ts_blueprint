@@ -3,16 +3,18 @@ import * as bodyParser from 'body-parser';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import Routes from '../routes/router';
+// import Routes from '../routes/router';
 import passport from 'passport';
+
+import '../config/env';
 
 export default class Application {
     private app: express.Application;
-    private routes: Routes;
+    // private routes: Routes;
 
     public constructor() {
         this.app = express();
-        this.routes = new Routes();
+        // this.routes = new Routes();
         this.init();
     }
 
@@ -30,7 +32,7 @@ export default class Application {
         // this.app.use('/api', this.routes.getAppRoutes());
 
         this.app.use((req, res) => {
-            res.status(404).send({ url: `${req.originalUrl} not found` });
+            res.status(404).send({ url: `${req.originalUrl} not found...` });
         });
     }
 

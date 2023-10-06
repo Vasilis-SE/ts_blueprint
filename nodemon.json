@@ -1,5 +1,7 @@
 {
     "watch": ["src"],
     "ext": "ts,json",
-    "exec": "dotenv -e ./src/env/.env.dev ts-node ./src/bin/index.ts"
+    "exec": "ts-node ./src/bin/index.ts --env .dev.env",
+    "ignore": ["node_modules/"]
 }
+
