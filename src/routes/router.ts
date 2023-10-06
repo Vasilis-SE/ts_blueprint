@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import userRoutes from './user';
-import movieRoutes from './movie';
-import rateRoutes from './rate';
+// import movieRoutes from './movie';
+// import rateRoutes from './rate';
 
 /**
  * Main router class that 'merges' all the separate routes into a single
@@ -18,8 +18,8 @@ export default class Routes {
     private initialize(): void {
         // Load all seperate routes
         this._routes.use('/user', userRoutes);
-        this._routes.use('/movie', movieRoutes);
-        this._routes.use('/rate', rateRoutes);
+        // this._routes.use('/movie', movieRoutes);
+        // this._routes.use('/rate', rateRoutes);
     }
 
     public getAppRoutes(): Router {

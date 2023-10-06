@@ -19,7 +19,6 @@ export default class Application {
     }
 
     private async init(): Promise<void> {
-        // TODO: async operations
         this.config();
     }
 
