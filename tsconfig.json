@@ -32,6 +32,8 @@
             "@middleware/*": ["src/middleware", "src/middleware/*"],
             "@decorators/*": ["src/helpers/decorators", "src/helpers/decorators/*"],
             "@enums/*": ["src/helpers/enums", "src/helpers/enums/*"],
+            "@data/*": ["src/data", "src/data/*"],
+            "@repositories/*": ["src/repositories", "src/repositories/*"],
         }
     },
     "exclude": ["node_modules"],
