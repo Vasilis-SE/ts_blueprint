@@ -8,7 +8,7 @@ import passport from 'passport';
 
 import '@config/env';
 
-export default class Application {
+export default class App {
     private app: express.Application;
     // private routes: Routes;
 

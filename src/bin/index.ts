@@ -1,4 +1,4 @@
-import Application from '@bin/app';
+import App from './app';
 
-const app = new Application();
+const app = new App();
 app.run();

@@ -1,4 +1,9 @@
 {
+    "ts-node": {
+        "require": [
+            "tsconfig-paths/register"
+        ]
+    },
     "compilerOptions": {
         "esModuleInterop": true,
         "target": "es6",
@@ -6,18 +11,23 @@
         "moduleResolution": "node",
         "outDir": "./dist",
         "allowJs": true,
+        "strict": true,
+        "rootDir": "./",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "baseUrl": ".",
         "types": ["jest", "node", "@types/jest"],
         "paths": {
-            "@bin/*": ["./src/bin/*"],
-            "@config/*": ["./src/config/*"],
-            "@controllers/*": ["./src/controllers/*"],
-            "@exceptions/*": ["./src/exceptions/*"],
-            "@helpers/*": ["./src/helpers/*"],
-            "@interfaces/*": ["./src/interfaces/*"],
-            "@models/*": ["./src/models/*"],
-            "@routes/*": ["./src/routes/*"],
-            "@security/*": ["./src/security/*"],
-            "@services/*": ["./src/services/*"],
+            "@bin/*": ["src/bin", "src/bin/*"],
+            "@config/*": ["src/config", "src/config/*"],
+            "@controllers/*": ["src/controllers", "src/controllers/*"],
+            "@exceptions/*": ["src/exceptions", "src/exceptions/*"],
+            "@helpers/*": ["src/helpers", "src/helpers/*"],
+            "@interfaces/*": ["src/interfaces", "src/interfaces/*"],
+            "@models/*": ["src/models", "src/models/*"],
+            "@routes/*": ["src/routes", "src/routes/*"],
+            "@security/*": ["src/security", "src/security/*"],
+            "@services/*": ["src/services", "src/services/*"],
         }
     },
     "exclude": ["node_modules"],

@@ -1,10 +1,9 @@
+import arg from 'arg';
 import path from 'path';
-import fs from 'fs';
 
-const indexOfEnvArg = process.argv.indexOf('--env');
-if (indexOfEnvArg === -1) process.exit(0);
+const args = arg({ '--env': String });
+const envFile = args['--env'];
 
-const envFile = process.argv[indexOfEnvArg + 1];
-if (!fs.existsSync(`./env/${envFile}`)) process.exit(0);
-
-require('dotenv').config({ path: path.join(__dirname, `../../env/${envFile}`) });
+require('dotenv').config({
+    path: path.join(__dirname, `../../env/${envFile}`),
+});
