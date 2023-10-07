@@ -1,53 +1,54 @@
 import * as bcrypt from 'bcrypt';
-import { UserGlobals } from '../interfaces/user';
-import Validator from '../helpers/validator';
+import { UserGlobals } from '@interfaces/user';
+import Validator from '@helpers/validator';
+import { ForbiddenCharacters } from '@helpers/enums/generalEnums';
 
 export default class Password {
-    private password: string;
+	private password: string;
 
-    constructor(p?: string) {
-        this.password = p ? p : '';
-    }
+	constructor(p?: string) {
+		this.password = p ? p : '';
+	}
 
-    hashPassword(): boolean {
-        try {
-            const saltRounds = 10;
-            const salt = bcrypt.genSaltSync(saltRounds);
-            const hash = bcrypt.hashSync(this.password, salt);
-            this.setPassword(hash);
+	public hashPassword(): boolean {
+		try {
+			const saltRounds = 10;
+			const salt = bcrypt.genSaltSync(saltRounds);
+			const hash = bcrypt.hashSync(this.password, salt);
+			this.setPassword(hash);
 
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 
-    async comparePassword(plainPass = ''): Promise<boolean> {
-        return await bcrypt.compare(plainPass, this.getPassword());
-    }
+	public async comparePassword(plainPass = ''): Promise<boolean> {
+		return await bcrypt.compare(plainPass, this.getPassword());
+	}
 
-    isPasswordLong(): boolean {
-        return this.password.length >= UserGlobals.PASSWORD_MINLENGTH;
-    }
+	public isPasswordLong(): boolean {
+		return this.password.length >= UserGlobals.PASSWORD_MINLENGTH;
+	}
 
-    async isPasswordStrong() {
-        let points = 0;
+	public async isPasswordStrong() {
+		let points = 0;
 
-        if (Validator.hasLowerCase(this.password)) points++;
-        if (Validator.hasUpperCase(this.password)) points++;
-        if (Validator.hasNumbers(this.password)) points++;
-        if (Validator.hasSpecialCharacters(this.password, '_ALL')) points++;
-        if (this.isPasswordLong()) points++;
+		if (Validator.hasLowerCase(this.password)) points++;
+		if (Validator.hasUpperCase(this.password)) points++;
+		if (Validator.hasNumbers(this.password)) points++;
+		if (Validator.hasSpecialCharacters(this.password, ForbiddenCharacters._ALL)) points++;
+		if (this.isPasswordLong()) points++;
 
-        return points >= 3;
-    }
+		return points >= 3;
+	}
 
-    // Getters - Setters
-    getPassword(): string {
-        return this.password;
-    }
+	// Getters - Setters
+	public getPassword(): string {
+		return this.password;
+	}
 
-    setPassword(p: string): void {
-        this.password = p;
-    }
+	public setPassword(p: string): void {
+		this.password = p;
+	}
 }

@@ -1,0 +1,8 @@
+.gitignore text eol=lf
+.vscode/** text eol=lf
+scripts/** text eol=lf
+*.json text eol=lf
+.env eol=lf
+.env.* eol=lf
+*.env eol=lf
+*.prisma eol=lf

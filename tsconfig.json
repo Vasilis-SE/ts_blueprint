@@ -26,8 +26,12 @@
             "@interfaces/*": ["src/interfaces", "src/interfaces/*"],
             "@models/*": ["src/models", "src/models/*"],
             "@routes/*": ["src/routes", "src/routes/*"],
+            "@routes_v1.0/*": ["src/routes/v1.0", "src/routes/v1.0/*"],
             "@security/*": ["src/security", "src/security/*"],
             "@services/*": ["src/services", "src/services/*"],
+            "@middleware/*": ["src/middleware", "src/middleware/*"],
+            "@decorators/*": ["src/helpers/decorators", "src/helpers/decorators/*"],
+            "@enums/*": ["src/helpers/enums", "src/helpers/enums/*"],
         }
     },
     "exclude": ["node_modules"],

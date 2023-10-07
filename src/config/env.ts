@@ -4,6 +4,7 @@ import path from 'path';
 const args = arg({ '--env': String });
 const envFile = args['--env'];
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config({
-    path: path.join(__dirname, `../../env/${envFile}`),
+	path: path.join(__dirname, `../../env/${envFile}`)
 });
