@@ -6,7 +6,7 @@ import helmet from 'helmet';
 // import Routes from '../routes/router';
 import passport from 'passport';
 
-import '../config/env';
+import '@config/env';
 
 export default class Application {
     private app: express.Application;

@@ -1,9 +1,9 @@
 
 import { NextFunction, Router } from 'express';
-import BaseController from '../controllers/baseController';
-import RateController from '../controllers/rate';
-import { InjectedRequest, InjectedResponse } from '../interfaces/express';
-import Security from '../security/security';
+import BaseController from '@controllers/baseController';
+import RateController from '@controllers/rate';
+import { InjectedRequest, InjectedResponse } from '@interfaces/express';
+import Security from '@security/security';
 
 const userRoutes = Router();
 const _security = new Security();

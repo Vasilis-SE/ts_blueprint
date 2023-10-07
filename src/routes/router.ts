@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import userRoutes from './user';
+import userRoutes from '@routes/user';
 // import movieRoutes from './movie';
 // import rateRoutes from './rate';
 

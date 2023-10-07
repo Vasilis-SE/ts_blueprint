@@ -6,7 +6,19 @@
         "moduleResolution": "node",
         "outDir": "./dist",
         "allowJs": true,
-        "types": ["jest", "node", "@types/jest"]
+        "types": ["jest", "node", "@types/jest"],
+        "paths": {
+            "@bin/*": ["./src/bin/*"],
+            "@config/*": ["./src/config/*"],
+            "@controllers/*": ["./src/controllers/*"],
+            "@exceptions/*": ["./src/exceptions/*"],
+            "@helpers/*": ["./src/helpers/*"],
+            "@interfaces/*": ["./src/interfaces/*"],
+            "@models/*": ["./src/models/*"],
+            "@routes/*": ["./src/routes/*"],
+            "@security/*": ["./src/security/*"],
+            "@services/*": ["./src/services/*"],
+        }
     },
     "exclude": ["node_modules"],
     "include": ["./src/**/*", "tests"]

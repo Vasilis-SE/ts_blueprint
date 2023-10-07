@@ -1,8 +1,8 @@
 import { NextFunction, Router } from 'express';
-import BaseController from '../controllers/baseController';
-import MovieController from '../controllers/movie';
-import { InjectedRequest, InjectedResponse } from '../interfaces/express';
-import Security from '../security/security';
+import BaseController from '@controllers/baseController';
+import MovieController from '@controllers/movie';
+import { InjectedRequest, InjectedResponse } from '@interfaces/express';
+import Security from '@security/security';
 
 const movieRoutes = Router();
 const _security = new Security();
