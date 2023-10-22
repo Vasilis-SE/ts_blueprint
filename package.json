@@ -7,7 +7,9 @@
     "lint": "eslint --quiet --fix ./src/**/*.ts",
     "test": "jest --watchAll --no-cache",
     "app:dev": "nodemon --config ./nodemon.json",
-    "db:migrate": "dotenv -e ./env/.env.dev -- npx prisma migrate dev",
+    "db:migrate": "dotenv -e ./env/.env.dev -- npx prisma migrate dev --name init",
+    "db:gen:client": "dotenv -e ./env/.env.dev -- npx prisma generate",
+
     "docker:up:dev": "docker-compose --env-file ./env/.env.dev -f ./scripts/docker-compose.yml up -d",
     "docker:build:dev": "docker-compose --env-file ./env/.env.dev -f ./scripts/docker-compose.yml build"
   },

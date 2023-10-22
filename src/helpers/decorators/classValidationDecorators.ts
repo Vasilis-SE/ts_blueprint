@@ -44,10 +44,12 @@ export function ShouldBeSecurePassword(validationOptions?: ValidationOptions) {
 			propertyName: propertyName,
 			options: validationOptions,
 			validator: {
-				async validate(value: string, args: ValidationArguments) {
+				validate(value: string, args: ValidationArguments) {
 					const password = new Password(value);
-					if (!(await password.isPasswordStrong())) throw new PasswordIsWeak();
-					return true;
+					return password.isPasswordStrong().then(isStrong => {
+						if (!isStrong) throw new PasswordIsWeak();
+						return true;
+					});
 				}
 			}
 		});

@@ -7,6 +7,12 @@ export class CouldNotFindUser extends BaseException {
 	}
 }
 
+export class UserAlreadyRated extends BaseException {
+	constructor() {
+		super('UserAlreadyRated', 'It seems you have already voted for that specific movie...', HttpCodes.BAD_REQUEST);
+	}
+}
+
 export class UserAlreadyExists extends BaseException {
 	constructor() {
 		super('UserAlreadyExists', 'User already exists with the given criteria...', HttpCodes.BAD_REQUEST);
@@ -44,12 +50,6 @@ export class CouldNotCreateNewMovie extends BaseException {
 export class NoMovies extends BaseException {
 	constructor() {
 		super('NoMovies', 'There are no movies with the given criteria...', HttpCodes.SERVER_ERROR);
-	}
-}
-
-export class UserAlreadyRated extends BaseException {
-	constructor() {
-		super('UserAlreadyRated', 'It seems you have already voted for that specific movie...', HttpCodes.BAD_REQUEST);
 	}
 }
 

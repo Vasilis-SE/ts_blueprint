@@ -1,16 +1,29 @@
 import Logger from '@config/logger';
+import UserData from '@data/userData';
+import { UserCreationFailed } from '@exceptions/customExceptions';
 import { IUser } from '@interfaces/userInterface';
 import UserModel from '@models/userModel';
+import UserPostgresRepository from '@repositories/postgres/userPostgresRepository';
+import { instanceToPlain } from 'class-transformer';
 import { validate } from 'class-validator';
 
 export default class UserService {
+	private userData: UserData;
+
+	constructor() {
+		this.userData = new UserData();
+	}
+
 	public async createNewUser(payload: UserModel): Promise<UserModel> {
 		Logger.info(`Going to create admin user...`, __filename);
 
-		// Validate input data.
 		await validate(payload, { skipMissingProperties: false, stopAtFirstError: true });
-
-		return new UserModel({} as IUser);
+		
+		const newUser = this.userData.storeUser(new UserPostgresRepository(), payload);
+		if(!newUser) throw new UserCreationFailed();
+		
+		Logger.info(`New user was created: [${instanceToPlain(newUser)}]...`, __filename);
+		return newUser as any;
 	}
 
 	// async createUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {
