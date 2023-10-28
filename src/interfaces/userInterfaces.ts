@@ -4,8 +4,13 @@ export interface IUser {
     password: string;
 }
 
-export interface IUserDB {
+export interface IUserDb {
     id: number;
     username: string;
     password: string;
+}
+
+export interface IUserQueryParams {
+    id?: number;
+    username?: string;
 }

@@ -1,9 +1,11 @@
 import Logger from '@config/logger';
 import UserData from '@data/userData';
-import { UserCreationFailed } from '@exceptions/customExceptions';
-import { IUser } from '@interfaces/userInterface';
+import { CouldNotFindUser, UserAlreadyExists, UserCreationFailed } from '@exceptions/customExceptions';
+import Base64Helper from '@helpers/base64Helper';
+import { AESGCMEncryptionCredentials } from '@interfaces/securityInterfaces';
 import UserModel from '@models/userModel';
 import UserPostgresRepository from '@repositories/postgres/userPostgresRepository';
+import AESGCM from '@security/aesGcm';
 import { instanceToPlain } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -16,14 +18,47 @@ export default class UserService {
 
 	public async createNewUser(payload: UserModel): Promise<UserModel> {
 		Logger.info(`Going to create admin user...`, __filename);
-
 		await validate(payload, { skipMissingProperties: false, stopAtFirstError: true });
-		
-		const newUser = this.userData.storeUser(new UserPostgresRepository(), payload);
-		if(!newUser) throw new UserCreationFailed();
-		
+
+		if (await this.userData.getUserByUsername(new UserPostgresRepository(), payload)) throw new UserAlreadyExists();
+
+		const plainPassword = payload.getPassword();
+		const encryptedPassword = AESGCM.encrypt(plainPassword);
+		payload.setPassword(Base64Helper.encode(JSON.stringify(encryptedPassword)));
+
+		const newUser = await this.userData.storeUser(new UserPostgresRepository(), payload);
+		if (!newUser) throw new UserCreationFailed();
+
+		payload.setPassword(plainPassword);
 		Logger.info(`New user was created: [${instanceToPlain(newUser)}]...`, __filename);
-		return newUser as any;
+		return newUser as UserModel;
+	}
+
+	public async getUserById(userToSearch: UserModel): Promise<UserModel> {
+		console.log(userToSearch);
+		const user = await this.userData.getUserById(new UserPostgresRepository(), userToSearch);
+		if (!user) throw new CouldNotFindUser();
+
+		const base64DecodedSecret: AESGCMEncryptionCredentials = JSON.parse(
+			Base64Helper.decode((user as UserModel).getPassword()), 
+			(key, value) => value.type === 'Buffer' ? Buffer.from(value.data) : value
+		);
+
+		(user as UserModel).setPassword(AESGCM.decrypt(base64DecodedSecret));
+		return user as UserModel;
+	}
+
+	public async getUserByUsername(userToSearch: UserModel): Promise<UserModel> {
+		const user = await this.userData.getUserByUsername(new UserPostgresRepository(), userToSearch);
+		if (!user) throw new CouldNotFindUser();
+
+		const base64DecodedSecret: AESGCMEncryptionCredentials = JSON.parse(
+			Base64Helper.decode((user as UserModel).getPassword()), 
+			(key, value) => value.type === 'Buffer' ? Buffer.from(value.data) : value
+		);
+
+		(user as UserModel).setPassword(AESGCM.decrypt(base64DecodedSecret));
+		return user as UserModel;
 	}
 
 	// async createUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {

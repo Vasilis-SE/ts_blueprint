@@ -1,15 +1,21 @@
-import { ShouldBeSecurePassword, ShouldNotBeEmpty, ShouldNotExceedLengthOfChars } from '@decorators/classValidationDecorators';
-import { IUser } from '@interfaces/userInterface';
+import {
+	ShouldBeSecurePassword,
+	ShouldNotBeEmpty,
+	ShouldNotExceedLengthOfChars
+} from '@decorators/classValidationDecorators';
+import { IUser } from '@interfaces/userInterfaces';
+import { Exclude } from 'class-transformer';
 
 export default class UserModel {
 	private id?: number | undefined;
 
 	@ShouldNotBeEmpty()
-    @ShouldNotExceedLengthOfChars(30)
+	@ShouldNotExceedLengthOfChars(30)
 	private username: string;
 
+	@Exclude({ toPlainOnly: true })
 	@ShouldNotBeEmpty()
-    @ShouldBeSecurePassword()
+	@ShouldBeSecurePassword()
 	private password: string;
 
 	constructor({ id, username, password }: IUser) {

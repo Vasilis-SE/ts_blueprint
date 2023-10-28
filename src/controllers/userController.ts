@@ -3,6 +3,7 @@ import UserModel from '@models/userModel';
 import UserService from '@services/userService';
 import { instanceToPlain } from 'class-transformer';
 import { HttpCodes } from '@helpers/httpCodesEnum';
+import { NoQueryParamProvided } from '@exceptions/customExceptions';
 
 export default class UserController {
 	private userService: UserService;
@@ -18,6 +19,38 @@ export default class UserController {
 	//     next();
 	// }
 
+	public async getUserById(req: Request, res: Response, next: NextFunction) {
+		try {
+			if (!('id' in req.params)) throw new NoQueryParamProvided('id');
+
+			res.locals.response = {
+				status: true,
+				httpCode: HttpCodes.OK,
+				data: instanceToPlain(await this.userService.getUserById(new UserModel(req.params as any)))
+			};
+
+			next();
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	public async getUserByUsername(req: Request, res: Response, next: NextFunction) {
+		try {
+			if (!('username' in req.params)) throw new NoQueryParamProvided('username');
+
+			res.locals.response = {
+				status: true,
+				httpCode: HttpCodes.OK,
+				data: instanceToPlain(await this.userService.getUserByUsername(new UserModel(req.params as any)))
+			};
+
+			next();
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	public async createUser(req: Request, res: Response, next: NextFunction) {
 		try {
 			res.locals.response = {
@@ -25,7 +58,7 @@ export default class UserController {
 				httpCode: HttpCodes.CREATED,
 				data: instanceToPlain(await this.userService.createNewUser(new UserModel(req.body)))
 			};
-			
+
 			next();
 		} catch (error) {
 			next(error);

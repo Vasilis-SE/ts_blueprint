@@ -46,10 +46,9 @@ export function ShouldBeSecurePassword(validationOptions?: ValidationOptions) {
 			validator: {
 				validate(value: string, args: ValidationArguments) {
 					const password = new Password(value);
-					return password.isPasswordStrong().then(isStrong => {
-						if (!isStrong) throw new PasswordIsWeak();
-						return true;
-					});
+					if(!password.isPasswordStrong())
+						throw new PasswordIsWeak();
+					return true;
 				}
 			}
 		});

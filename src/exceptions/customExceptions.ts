@@ -161,6 +161,12 @@ export class InvalidParameterType extends ExpectedPropertyException {
 	}
 }
 
+export class NoQueryParamProvided extends PropertyException {
+	constructor(prop: string) {
+		super('NoQueryParamProvided', 'Necessary query parameter was not provided...', HttpCodes.BAD_REQUEST, prop);
+	}
+}
+
 export class InvalidParameterFormat extends ExpectedPropertyException {
 	constructor(prop: string, exp: string) {
 		super(
@@ -198,5 +204,6 @@ export class InvalidParameterFormat extends ExpectedPropertyException {
 	RequestBodyIsEmpty,
 	InvalidPropertyType,
 	InvalidParameterType,
-	InvalidParameterFormat
+	InvalidParameterFormat,
+	NoQueryParamProvided
 };
