@@ -3,8 +3,9 @@ import {
 	ShouldNotBeEmpty,
 	ShouldNotExceedLengthOfChars
 } from '@decorators/classValidationDecorators';
-import { IUser } from '@interfaces/userInterfaces';
+import { IProfile, IUser } from '@interfaces/userInterfaces';
 import { Exclude } from 'class-transformer';
+import ProfileModel from './profileModel';
 
 export default class UserModel {
 	private id?: number | undefined;
@@ -18,10 +19,14 @@ export default class UserModel {
 	@ShouldBeSecurePassword()
 	private password: string;
 
-	constructor({ id, username, password }: IUser) {
-		this.id = id;
-		this.username = username;
-		this.password = password;
+	private profile?: ProfileModel | null;
+
+
+	constructor(user: IUser) {
+		this.id = user.id;
+		this.username = user.username;
+		this.password = user.password;
+		this.profile = user.profile;
 	}
 
 	public getId(): number | undefined {
@@ -36,6 +41,10 @@ export default class UserModel {
 		return this.password;
 	}
 
+	public getProfile(): ProfileModel | null | undefined {
+		return this.profile;
+	}
+
 	public setId(value: number | undefined): void {
 		this.id = value;
 	}
@@ -46,5 +55,9 @@ export default class UserModel {
 
 	public setPassword(value: string): void {
 		this.password = value;
+	}
+
+	public setProfile(value: ProfileModel | undefined | null): void {
+		this.profile = value;
 	}
 }

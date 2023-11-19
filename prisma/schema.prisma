@@ -8,17 +8,28 @@ datasource db {
 }
 
 model users {
-  id       Int    @id @default(autoincrement())
-  username String @unique
+  id       Int       @id @default(autoincrement())
+  username String    @unique
   password String
   movies   movies[]
+  profile  profiles?
+}
+
+model profiles {
+  id         Int     @id @default(autoincrement())
+  user       users   @relation(fields: [userid], references: [id], onDelete: Cascade)
+  userid     Int     @unique
+  first_name String  @db.VarChar(50)
+  last_name  String  @db.VarChar(50)
+  address    String
+  image      String?
 }
 
 model movies {
-  id          Int    @id @default(autoincrement())
-  author      users  @relation(fields: [userid], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  author      users    @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid      Int
-  title       String @unique
+  title       String   @unique
   description String
   likes       Int
   hates       Int

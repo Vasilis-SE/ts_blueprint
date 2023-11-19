@@ -16,6 +16,13 @@ userRoutes.post(
 	(req: Request, res: Response, next: NextFunction) => sendHttpResponse(req, res, next)
 );
 
+userRoutes.post(
+	'/profile/:userid([0-9]+)',
+	(req: Request, res: Response, next: NextFunction) => controller.createUser(req, res, next),
+	errorHandler.getHandler(),
+	(req: Request, res: Response, next: NextFunction) => sendHttpResponse(req, res, next)
+);
+
 userRoutes.get(
 	'/:id([0-9]+)',
 	(req: Request, res: Response, next: NextFunction) => controller.getUserById(req, res, next),

@@ -4,6 +4,8 @@ import UserService from '@services/userService';
 import { instanceToPlain } from 'class-transformer';
 import { HttpCodes } from '@helpers/httpCodesEnum';
 import { NoQueryParamProvided } from '@exceptions/customExceptions';
+import { IProfile, IUser } from '@interfaces/userInterfaces';
+import ProfileModel from '@models/profileModel';
 
 export default class UserController {
 	private userService: UserService;
@@ -53,10 +55,15 @@ export default class UserController {
 
 	public async createUser(req: Request, res: Response, next: NextFunction) {
 		try {
+			const newUser: UserModel = await this.userService.createNewUser(
+				new UserModel(req.body),
+				'profile' in req.body ? new ProfileModel(req.body?.profile) : undefined
+			);
+
 			res.locals.response = {
 				status: true,
 				httpCode: HttpCodes.CREATED,
-				data: instanceToPlain(await this.userService.createNewUser(new UserModel(req.body)))
+				data: instanceToPlain(newUser)
 			};
 
 			next();
@@ -65,12 +72,24 @@ export default class UserController {
 		}
 	}
 
-	// async getUsers(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {
-	//     const query: any = req.query;
-	//     const params: any = req.params;
-	//     const response: ISuccessfulResponse | IFailedResponse = await this._service.getUsers(params, query);
-	//     res.response = response;
-	//     next();
+	// public async addUserProfile(req: Request, res: Response, next: NextFunction) {
+	// 	try {
+	// 		if (!('userid' in req.params)) throw new NoQueryParamProvided('userid');
+
+	// 		const newUser: UserModel = await this.userService.addUserProfile(
+	// 			new ProfileModel({ ...req.params, ...req.body })
+	// 		);
+
+	// 		res.locals.response = {
+	// 			status: true,
+	// 			httpCode: HttpCodes.CREATED,
+	// 			data: instanceToPlain(newUser)
+	// 		};
+
+	// 		next();
+	// 	} catch (error) {
+	// 		next(error);
+	// 	}
 	// }
 
 	// async loginUser(req: InjectedRequest, res: InjectedResponse, next: NextFunction): Promise<void> {

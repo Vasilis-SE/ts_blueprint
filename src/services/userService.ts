@@ -3,6 +3,8 @@ import UserData from '@data/userData';
 import { CouldNotFindUser, UserAlreadyExists, UserCreationFailed } from '@exceptions/customExceptions';
 import Base64Helper from '@helpers/base64Helper';
 import { AESGCMEncryptionCredentials } from '@interfaces/securityInterfaces';
+import { IUser } from '@interfaces/user';
+import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import UserPostgresRepository from '@repositories/postgres/userPostgresRepository';
 import AESGCM from '@security/aesGcm';
@@ -16,32 +18,36 @@ export default class UserService {
 		this.userData = new UserData();
 	}
 
-	public async createNewUser(payload: UserModel): Promise<UserModel> {
-		Logger.info(`Going to create admin user...`, __filename);
-		await validate(payload, { skipMissingProperties: false, stopAtFirstError: true });
+	public async createNewUser(user: UserModel, profile?: ProfileModel): Promise<UserModel> {
+		Logger.info(`Going to create user...`, __filename);
 
-		if (await this.userData.getUserByUsername(new UserPostgresRepository(), payload)) throw new UserAlreadyExists();
+		// Validate data
+		await validate(user, { skipMissingProperties: false, stopAtFirstError: true });
+		if (profile) await validate(user, { skipMissingProperties: false, stopAtFirstError: true });
 
-		const plainPassword = payload.getPassword();
+		// Check if user exists
+		if (await this.userData.getUserByUsername(new UserPostgresRepository(), user.getUsername())) throw new UserAlreadyExists();
+
+		const plainPassword = user.getPassword();
 		const encryptedPassword = AESGCM.encrypt(plainPassword);
-		payload.setPassword(Base64Helper.encode(JSON.stringify(encryptedPassword)));
+		user.setPassword(Base64Helper.encode(JSON.stringify(encryptedPassword)));
 
-		const newUser = await this.userData.storeUser(new UserPostgresRepository(), payload);
+		// Store user
+		const newUser = await this.userData.storeUser(new UserPostgresRepository(), user, profile);
 		if (!newUser) throw new UserCreationFailed();
 
-		payload.setPassword(plainPassword);
-		Logger.info(`New user was created: [${instanceToPlain(newUser)}]...`, __filename);
+		user.setPassword(plainPassword);
+		Logger.info(`New user was created: [${JSON.stringify(instanceToPlain(newUser))}]...`, __filename);
 		return newUser as UserModel;
 	}
 
 	public async getUserById(userToSearch: UserModel): Promise<UserModel> {
-		console.log(userToSearch);
-		const user = await this.userData.getUserById(new UserPostgresRepository(), userToSearch);
+		const user = await this.userData.getUserById(new UserPostgresRepository(), userToSearch.getId() as number);
 		if (!user) throw new CouldNotFindUser();
 
 		const base64DecodedSecret: AESGCMEncryptionCredentials = JSON.parse(
-			Base64Helper.decode((user as UserModel).getPassword()), 
-			(key, value) => value.type === 'Buffer' ? Buffer.from(value.data) : value
+			Base64Helper.decode((user as UserModel).getPassword()),
+			(key, value) => (value.type === 'Buffer' ? Buffer.from(value.data) : value)
 		);
 
 		(user as UserModel).setPassword(AESGCM.decrypt(base64DecodedSecret));
@@ -49,103 +55,30 @@ export default class UserService {
 	}
 
 	public async getUserByUsername(userToSearch: UserModel): Promise<UserModel> {
-		const user = await this.userData.getUserByUsername(new UserPostgresRepository(), userToSearch);
+		const user = await this.userData.getUserByUsername(new UserPostgresRepository(), userToSearch.getUsername());
 		if (!user) throw new CouldNotFindUser();
 
 		const base64DecodedSecret: AESGCMEncryptionCredentials = JSON.parse(
-			Base64Helper.decode((user as UserModel).getPassword()), 
-			(key, value) => value.type === 'Buffer' ? Buffer.from(value.data) : value
+			Base64Helper.decode((user as UserModel).getPassword()),
+			(key, value) => (value.type === 'Buffer' ? Buffer.from(value.data) : value)
 		);
 
 		(user as UserModel).setPassword(AESGCM.decrypt(base64DecodedSecret));
 		return user as UserModel;
 	}
 
-	// async createUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {
-	// 	try {
-	// 		const validProperties = ['username', 'password'];
-	// 		if (Object.keys(payload).length > validProperties.length) throw new ExcessiveBodyProperties();
+	// public async addUserProfile(profilePayload: ProfileModel): Promise<ProfileModel> {
+	// 	await validate(profilePayload, { skipMissingProperties: false, stopAtFirstError: true });
 
-	// 		if (!('username' in payload) || !payload.username) throw new PropertyIsMissing('', 'username');
-	// 		if (!('password' in payload) || !payload.password) throw new PropertyIsMissing('', 'password');
-	// 		if (typeof payload.username !== 'string') throw new InvalidPropertyType('', 'string', 'username');
-	// 		if (typeof payload.password !== 'string') throw new InvalidPropertyType('', 'string', 'password');
+	// 	// Check if user exists
+	// 	if (!await this.userData.getUserById(new UserPostgresRepository(), profilePayload.getUserId()))
+	// 		throw new CouldNotFindUser();
 
-	// 		if (Validator.hasSpecialCharacters(payload.username, '_ALL'))
-	// 			throw new ContainsInvalidChars('', 'username');
-	// 		if (payload.username.length > UserGlobals.USERNAME_MAXLENGTH) throw new InputExceedMaxLimit('', 'username');
+	// 	// Check if profile already exists
+	// 	if (await this.userData(new UserPostgresRepository(), profilePayload.getUserId()))
 
-	// 		// Check if password is strong & hash it
-	// 		const _password = new Password(payload.password);
-	// 		if (!(await _password.isPasswordStrong())) throw new PasswordIsWeak();
-	// 		if (!(await _password.hashPassword())) throw new FailedToRenderHash();
 
-	// 		// Populate only the user in the model to check whether there is
-	// 		// already any other user with the same username.
-	// 		const _model = new UserModel();
-	// 		_model.setUsername(payload.username);
-
-	// 		const exists: IListOfUsers | boolean = await _model.getUsers();
-	// 		if (exists) throw new UserAlreadyExists();
-
-	// 		// Set to model the hashed password
-	// 		_model.setPassword(_password.getPassword());
-	// 		_model.setCreatedAtStamp(Math.floor(Date.now() / 1000));
-
-	// 		if (!(await _model.createUser())) throw new UserCreationFailed();
-
-	// 		_model.setPassword(''); // clean passowrd so that it wont be displayed on response
-	// 		const response: ISuccessfulResponse = {
-	// 			status: true,
-	// 			httpCode: HttpCodes.CREATED,
-	// 			data: ObjectHandler.getResource(_model)
-	// 		};
-	// 		return response;
-	// 	} catch (e) {
-	// 		if (
-	// 			!(e instanceof ExcessiveBodyProperties) &&
-	// 			!(e instanceof PropertyIsMissing) &&
-	// 			!(e instanceof InvalidPropertyType) &&
-	// 			!(e instanceof ContainsInvalidChars) &&
-	// 			!(e instanceof InputExceedMaxLimit) &&
-	// 			!(e instanceof PasswordIsWeak) &&
-	// 			!(e instanceof FailedToRenderHash) &&
-	// 			!(e instanceof UserAlreadyExists) &&
-	// 			!(e instanceof UserCreationFailed)
-	// 		)
-	// 			throw e;
-
-	// 		const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
-	// 		const error: IFailedResponse = errorResource;
-	// 		return error;
-	// 	}
-	// }
-
-	// async getUsers(
-	// 	user: IUserProperties,
-	// 	filters: IRequestQueryFilters
-	// ): Promise<ISuccessfulResponse | IFailedResponse> {
-	// 	try {
-	// 		const finalFilters: ISQLFilters = Filters._sqlFilters(filters);
-	// 		const _model = new UserModel(user);
-
-	// 		finalFilters.fields = ['id', 'username', 'created_at'];
-	// 		const results: any = await _model.getUsers(finalFilters);
-	// 		if (!results) throw new CouldNotFindUser();
-
-	// 		const response: ISuccessfulResponse = {
-	// 			status: true,
-	// 			httpCode: HttpCodes.OK,
-	// 			data: ObjectHandler.getResource(results)
-	// 		};
-	// 		return response;
-	// 	} catch (e) {
-	// 		if (!(e instanceof CouldNotFindUser)) throw e;
-
-	// 		const errorResource: any = { status: false, ...ObjectHandler.getResource(e) };
-	// 		const error: IFailedResponse = errorResource;
-	// 		return error;
-	// 	}
+	// 	// Logger.info(`New user was created: [${JSON.stringify(instanceToPlain(newUser))}]...`, __filename);
 	// }
 
 	// async loginUser(payload: IUserProperties): Promise<ISuccessfulResponse | IFailedResponse> {
