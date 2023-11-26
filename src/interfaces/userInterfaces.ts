@@ -1,9 +1,13 @@
 import ProfileModel from "@models/profileModel";
 
+
 export interface IUser {
     id?: number | undefined;
     username: string;
     password: string;
+}
+
+export interface IUserExtended extends IUser {
     profile?: ProfileModel | null;
 }
 
@@ -11,7 +15,14 @@ export interface IUserDb {
     id: number;
     username: string;
     password: string;
+}
+
+export interface IUserDbExtended extends IUserDb {
     profile?: IProfileDb | null;
+}
+
+export interface IUserDbSearchCriteria {
+    where: Partial<IUserDb>
 }
 
 export interface IUserQueryParams {

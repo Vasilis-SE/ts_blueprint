@@ -1,16 +1,17 @@
 import Logger from '@config/logger';
-import { IProfileDb, IUserDb } from '@interfaces/userInterfaces';
+import { IProfileDb, IUserDbExtended, IUserDbSearchCriteria } from '@interfaces/userInterfaces';
 import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import { PrismaClient } from '@prisma/client';
 import UserRepository from '@repositories/userRepository';
 
 export default class UserPostgresRepository extends UserRepository {
-	public async getUserById(userid: number): Promise<boolean | IUserDb> {
+
+	public async getUserById(userid: number): Promise<boolean | IUserDbExtended> {
 		const prisma = new PrismaClient();
 
 		try {
-			const searchedUser: IUserDb | null = await prisma.users.findUnique({
+			const searchedUser: IUserDbExtended | null = await prisma.users.findUnique({
 				where: {
 					id: Number(userid)
 				},
@@ -28,11 +29,11 @@ export default class UserPostgresRepository extends UserRepository {
 		}
 	}
 
-	public async getUserByUsername(username: string): Promise<boolean | IUserDb> {
+	public async getUserByUsername(username: string): Promise<boolean | IUserDbExtended> {
 		const prisma = new PrismaClient();
 
 		try {
-			const searchedUser: IUserDb | null = await prisma.users.findUnique({
+			const searchedUser: IUserDbExtended | null = await prisma.users.findUnique({
 				where: {
 					username: username
 				}
@@ -47,12 +48,12 @@ export default class UserPostgresRepository extends UserRepository {
 		}
 	}
 
-	public async storeUser(user: UserModel, userProfile?: ProfileModel): Promise<IUserDb | boolean> {
+	public async storeUser(user: UserModel, userProfile?: ProfileModel): Promise<IUserDbExtended | boolean> {
 		const prisma = new PrismaClient();
 
 		try {
 			const result = await prisma.$transaction(async prisma => {
-				const prismaUser: IUserDb = await prisma.users.create({
+				const prismaUser: IUserDbExtended = await prisma.users.create({
 					data: {
 						username: user.getUsername(),
 						password: user.getPassword()

@@ -3,7 +3,7 @@ import {
 	ShouldNotBeEmpty,
 	ShouldNotExceedLengthOfChars
 } from '@decorators/classValidationDecorators';
-import { IProfile, IUser } from '@interfaces/userInterfaces';
+import { IUserExtended } from '@interfaces/userInterfaces';
 import { Exclude } from 'class-transformer';
 import ProfileModel from './profileModel';
 
@@ -22,7 +22,7 @@ export default class UserModel {
 	private profile?: ProfileModel | null;
 
 
-	constructor(user: IUser) {
+	constructor(user: IUserExtended) {
 		this.id = user.id;
 		this.username = user.username;
 		this.password = user.password;

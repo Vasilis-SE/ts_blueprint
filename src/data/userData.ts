@@ -1,4 +1,4 @@
-import { IProfile, IProfileDb, IUserDb } from '@interfaces/userInterfaces';
+import { IProfileDb, IUserDbExtended } from '@interfaces/userInterfaces';
 import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import UserRepository from '@repositories/userRepository';
@@ -9,23 +9,24 @@ export default class UserData {
 		user: UserModel,
 		profile?: ProfileModel
 	): Promise<UserModel | boolean> {
-		const result: boolean | IUserDb = await userRepository.storeUser(user, profile);
+		const result: boolean | IUserDbExtended = await userRepository.storeUser(user, profile);
 		if (!result) return false;
 
 		const newUser = new UserModel({
-			id: (result as IUserDb).id,
-			username: (result as IUserDb).username,
-			password: (result as IUserDb).password
+			id: (result as IUserDbExtended).id,
+			username: (result as IUserDbExtended).username,
+			password: (result as IUserDbExtended).password
 		});
 
 		if (profile)
 			newUser.setProfile(
 				new ProfileModel({
-					userid: ((result as IUserDb).profile as IProfileDb).userid,
-					firstName: ((result as IUserDb).profile as IProfileDb).first_name,
-					lastName: ((result as IUserDb).profile as IProfileDb).last_name,
-					address: ((result as IUserDb).profile as IProfileDb).address,
-					image: ((result as IUserDb).profile as IProfileDb).image
+					id: ((result as IUserDbExtended).profile as IProfileDb).id,
+					userid: ((result as IUserDbExtended).profile as IProfileDb).userid,
+					firstName: ((result as IUserDbExtended).profile as IProfileDb).first_name,
+					lastName: ((result as IUserDbExtended).profile as IProfileDb).last_name,
+					address: ((result as IUserDbExtended).profile as IProfileDb).address,
+					image: ((result as IUserDbExtended).profile as IProfileDb).image
 				})
 			);
 
@@ -33,41 +34,57 @@ export default class UserData {
 	}
 
 	public async getUserById(userRepository: UserRepository, userid: number): Promise<UserModel | boolean> {
-		const searchedUser: boolean | IUserDb = await userRepository.getUserById(userid);
-		console.log(searchedUser);
+		const searchedUser: boolean | IUserDbExtended = await userRepository.getUserById(userid);
+		if (!searchedUser) return false;
 
+		const user = new UserModel({
+			id: (searchedUser as IUserDbExtended).id,
+			username: (searchedUser as IUserDbExtended).username,
+			password: (searchedUser as IUserDbExtended).password
+		});
 
-		return !searchedUser
-			? false
-			: new UserModel({
-				id: (searchedUser as IUserDb).id,
-				username: (searchedUser as IUserDb).username,
-				password: (searchedUser as IUserDb).password,
-				profile: {
-					id: (searchedUser as IUserDb).profile?.id,
-					userid: (searchedUser as IUserDb).profile?.userid,
-					firstName: (searchedUser as IUserDb).profile?.first_name,
-					lastName: (searchedUser as IUserDb).profile?.last_name,
-					address: (searchedUser as IUserDb).profile?.address,
-					image: (searchedUser as IUserDb).profile?.image,
-				} as IProfile
-			});
+		if ((searchedUser as IUserDbExtended).profile)
+			user.setProfile(
+				new ProfileModel({
+					id: ((searchedUser as IUserDbExtended).profile as IProfileDb).id,
+					userid: ((searchedUser as IUserDbExtended).profile as IProfileDb).userid,
+					firstName: ((searchedUser as IUserDbExtended).profile as IProfileDb).first_name,
+					lastName: ((searchedUser as IUserDbExtended).profile as IProfileDb).last_name,
+					address: ((searchedUser as IUserDbExtended).profile as IProfileDb).address,
+					image: ((searchedUser as IUserDbExtended).profile as IProfileDb).image
+				})
+			);
+
+		return user;
 	}
 
 	public async getUserByUsername(userRepository: UserRepository, username: string): Promise<UserModel | boolean> {
-		const searchedUser: boolean | IUserDb = await userRepository.getUserByUsername(username);
-		return !searchedUser
-			? false
-			: new UserModel({
-				id: (searchedUser as IUserDb).id,
-				username: (searchedUser as IUserDb).username,
-				password: (searchedUser as IUserDb).password
-			});
+		const searchedUser: boolean | IUserDbExtended = await userRepository.getUserByUsername(username);
+		if (!searchedUser) return false;
+
+		const user = new UserModel({
+			id: (searchedUser as IUserDbExtended).id,
+			username: (searchedUser as IUserDbExtended).username,
+			password: (searchedUser as IUserDbExtended).password
+		});
+
+		if ((searchedUser as IUserDbExtended).profile)
+			user.setProfile(
+				new ProfileModel({
+					id: ((searchedUser as IUserDbExtended).profile as IProfileDb).id,
+					userid: ((searchedUser as IUserDbExtended).profile as IProfileDb).userid,
+					firstName: ((searchedUser as IUserDbExtended).profile as IProfileDb).first_name,
+					lastName: ((searchedUser as IUserDbExtended).profile as IProfileDb).last_name,
+					address: ((searchedUser as IUserDbExtended).profile as IProfileDb).address,
+					image: ((searchedUser as IUserDbExtended).profile as IProfileDb).image
+				})
+			);
+
+		return user;
 	}
-	
+
 	public async storeProfile(userRepository: UserRepository, profile: ProfileModel): Promise<ProfileModel | boolean> {
 		const result: IProfileDb | boolean = await userRepository.storeProfile(profile);
 		return !result ? false : profile;
 	}
-
 }
