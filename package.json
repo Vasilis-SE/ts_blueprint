@@ -10,7 +10,6 @@
     "db:migrate": "dotenv -e ./env/.env.dev -- npx prisma migrate dev --name init",
     "db:gen:client": "dotenv -e ./env/.env.dev -- npx prisma generate",
     "db:reset": "dotenv -e ./env/.env.dev -- npx prisma migrate reset",
-
     "docker:up:dev": "docker-compose --env-file ./env/.env.dev -f ./scripts/docker-compose.yml up -d",
     "docker:build:dev": "docker-compose --env-file ./env/.env.dev -f ./scripts/docker-compose.yml build"
   },
@@ -56,6 +55,7 @@
     "jsonwebtoken": "^8.5.1",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
+    "redis": "^4.6.11",
     "tsconfig-paths": "^4.2.0",
     "winston": "^3.10.0"
   }

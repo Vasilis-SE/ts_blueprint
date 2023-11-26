@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import Routes from '@routes_v1.0/router';
 import passport from 'passport';
+import RedisConnector from '@connections/redisConnector';
 
 import '@config/env';
 
@@ -19,6 +20,8 @@ export default class App {
 	}
 
 	private async init(): Promise<void> {
+		RedisConnector.setup();
+
 		this.config();
 	}
 

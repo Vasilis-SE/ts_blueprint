@@ -7,6 +7,34 @@ import UserRepository from '@repositories/userRepository';
 
 export default class UserPostgresRepository extends UserRepository {
 
+
+	// public async getUser(prismaArgs: ): Promise<boolean | IUserDbExtended> {
+	// 	const prisma = new PrismaClient();
+
+
+	// 	try {
+	// 		const searchedUser: IUserDbExtended | null = await prisma.users.findUnique({
+	// 			where: {
+	// 				id: Number(userid)
+	// 			},
+	// 			include: {
+	// 				profile: true
+	// 			}
+	// 		});
+
+	// 		if (!searchedUser) throw new Error(`Could not find user with given id [${userid}]...`);
+
+	// 		return searchedUser;
+	// 	} catch (error: any) {
+	// 		Logger.error(`Repository Error on getUser. Message: ${error.message}`, __filename);
+	// 		return false;
+	// 	}
+	// }
+
+
+
+
+
 	public async getUserById(userid: number): Promise<boolean | IUserDbExtended> {
 		const prisma = new PrismaClient();
 
@@ -36,6 +64,9 @@ export default class UserPostgresRepository extends UserRepository {
 			const searchedUser: IUserDbExtended | null = await prisma.users.findUnique({
 				where: {
 					username: username
+				},
+				include: {
+					profile: true
 				}
 			});
 
@@ -44,6 +75,25 @@ export default class UserPostgresRepository extends UserRepository {
 			return searchedUser;
 		} catch (error: any) {
 			Logger.error(`Repository Error on getUserByUsername. Message: ${error.message}`, __filename);
+			return false;
+		}
+	}
+
+	public async getUserProfile(userid: number): Promise<IProfileDb | boolean> {
+		const prisma = new PrismaClient();
+
+		try {
+			const userProfile: IProfileDb | null = await prisma.profiles.findUnique({
+				where: {
+					userid: userid
+				}
+			});
+
+			if (!userProfile) throw new Error(`Could not find a user profile for user [${userid}]...`);
+
+			return userProfile;
+		} catch (error: any) {
+			Logger.error(`Repository Error on getUserProfile. Message: ${error.message}`, __filename);
 			return false;
 		}
 	}

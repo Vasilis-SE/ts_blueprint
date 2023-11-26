@@ -34,6 +34,7 @@
             "@enums/*": ["src/helpers/enums", "src/helpers/enums/*"],
             "@data/*": ["src/data", "src/data/*"],
             "@repositories/*": ["src/repositories", "src/repositories/*"],
+            "@connections/*": ["src/connections", "src/connections/*"],
         }
     },
     "exclude": ["node_modules"],
