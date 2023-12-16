@@ -1,14 +1,16 @@
-import { IProfileDb, IUserDbExtended } from '@interfaces/userInterfaces';
+import { IProfileDb, IUserDb, IUserDbExtended } from '@interfaces/userInterfaces';
 import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import UserRepository from '@repositories/userRepository';
 
 export default class UserData {
+	
 	public async storeUser(
 		userRepository: UserRepository,
 		user: UserModel,
 		profile?: ProfileModel
 	): Promise<UserModel | boolean> {
+
 		const result: boolean | IUserDbExtended = await userRepository.storeUser(user, profile);
 		if (!result) return false;
 

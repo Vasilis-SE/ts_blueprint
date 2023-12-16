@@ -3,10 +3,10 @@ import UserData from '@data/userData';
 import { CouldNotFindUser, UserAlreadyExists, UserCreationFailed } from '@exceptions/customExceptions';
 import Base64Helper from '@helpers/base64Helper';
 import { AESGCMEncryptionCredentials } from '@interfaces/securityInterfaces';
-import { IUser } from '@interfaces/user';
 import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import UserPostgresRepository from '@repositories/postgres/userPostgresRepository';
+import UserRedisRepository from '@repositories/redis/userRedisRepository';
 import AESGCM from '@security/aesGcm';
 import { instanceToPlain } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -35,6 +35,9 @@ export default class UserService {
 		// Store user
 		const newUser = await this.userData.storeUser(new UserPostgresRepository(), user, profile);
 		if (!newUser) throw new UserCreationFailed();
+
+		if (!await this.userData.storeUser(new UserRedisRepository(), newUser as UserModel, profile)) 
+			throw new UserCreationFailed();
 
 		user.setPassword(plainPassword);
 		Logger.info(`New user was created: [${JSON.stringify(instanceToPlain(newUser))}]...`, __filename);

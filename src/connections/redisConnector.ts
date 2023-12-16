@@ -12,17 +12,7 @@ class RedisConnector {
 			password: process.env.REDIS_PASS
 		});
 
-		this.setup();
-	}
-
-	public static getInstance(): RedisConnector {
-		if (!RedisConnector.instance) RedisConnector.instance = new RedisConnector();
-
-		return RedisConnector.instance;
-	}
-
-	public async setup(): Promise<void> {
-		await this.connector.connect();
+		this.connector.connect();
 
 		this.connector.on('error', (err: any) => {
 			Logger.error(`Fatal error! Could not connect to redis reason: ${err}...`, __filename);
@@ -31,7 +21,14 @@ class RedisConnector {
 
 		this.connector.on('connect', async () => {
 			Logger.info(`Connected to redis...`, __filename);
+			this.connector.auth({ password: process.env.REDIS_PASS as string });
 		});
+	}
+
+	public static getInstance(): RedisConnector {
+		if (!RedisConnector.instance) RedisConnector.instance = new RedisConnector();
+
+		return RedisConnector.instance;
 	}
 
 	public quit(): void {
