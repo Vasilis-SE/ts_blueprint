@@ -35,6 +35,7 @@
             "@data/*": ["src/data", "src/data/*"],
             "@repositories/*": ["src/repositories", "src/repositories/*"],
             "@connections/*": ["src/connections", "src/connections/*"],
+            "@mappers/*": ["src/helpers/mappers", "src/helpers/mappers/*"],
         }
     },
     "exclude": ["node_modules"],

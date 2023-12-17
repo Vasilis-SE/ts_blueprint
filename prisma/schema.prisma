@@ -19,9 +19,9 @@ model profiles {
   id         Int     @id @default(autoincrement())
   user       users   @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid     Int     @unique
-  first_name String  @db.VarChar(50)
-  last_name  String  @db.VarChar(50)
-  address    String
+  first_name String? @db.VarChar(50)
+  last_name  String? @db.VarChar(50)
+  address    String?
   image      String?
 }
 

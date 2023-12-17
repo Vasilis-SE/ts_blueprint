@@ -3,30 +3,28 @@ import {
 	ShouldNotBeEmpty,
 	ShouldNotExceedLengthOfChars
 } from '@decorators/classValidationDecorators';
-import { IUserExtended } from '@interfaces/userInterfaces';
+import { IUser } from '@interfaces/userInterfaces';
 import { Exclude } from 'class-transformer';
 import ProfileModel from './profileModel';
 
 export default class UserModel {
-	private id?: number | undefined;
+	private id?: number;
 
 	@ShouldNotBeEmpty()
 	@ShouldNotExceedLengthOfChars(30)
-	private username: string;
+	private username!: string;
 
 	@Exclude({ toPlainOnly: true })
 	@ShouldNotBeEmpty()
 	@ShouldBeSecurePassword()
-	private password: string;
+	private password!: string;
 
-	private profile?: ProfileModel | null;
+	private profile?: ProfileModel;
 
-
-	constructor(user: IUserExtended) {
-		this.id = user.id;
-		this.username = user.username;
-		this.password = user.password;
-		this.profile = user.profile;
+	constructor({id, username, password}: IUser) {
+		this.setId(id);
+		this.setUsername(username);
+		this.setPassword(password);
 	}
 
 	public getId(): number | undefined {
@@ -57,7 +55,7 @@ export default class UserModel {
 		this.password = value;
 	}
 
-	public setProfile(value: ProfileModel | undefined | null): void {
+	public setProfile(value?: ProfileModel): void {
 		this.profile = value;
 	}
 }

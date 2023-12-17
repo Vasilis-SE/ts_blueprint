@@ -1,14 +1,20 @@
-import ProfileModel from "@models/profileModel";
-
-
 export interface IUser {
-    id?: number | undefined;
+    id?: number;
     username: string;
     password: string;
 }
 
+export interface IProfile {
+    id?: number,
+    userid: number
+    firstName: string | null
+    lastName: string | null
+    address: string | null
+    image: string | null
+}
+
 export interface IUserExtended extends IUser {
-    profile?: ProfileModel | null;
+    profile?: IProfile | null;
 }
 
 export interface IUserDb {
@@ -17,33 +23,15 @@ export interface IUserDb {
     password: string;
 }
 
+export interface IProfileDb {
+    id: number;
+    userid: number;
+    first_name: string | null;
+    last_name: string | null;
+    address: string | null;
+    image: string | null;
+}
+
 export interface IUserDbExtended extends IUserDb {
     profile?: IProfileDb | null;
-}
-
-export interface IUserDbSearchCriteria {
-    where: Partial<IUserDb>
-}
-
-export interface IUserQueryParams {
-    id?: number;
-    username?: string;
-}
-
-export interface IProfile {
-    id: number,
-    userid: number
-    firstName: string
-    lastName: string
-    address: string
-    image?: string | null
-}
-
-export interface IProfileDb {
-    id: number,
-    userid: number
-    first_name: string
-    last_name: string
-    address: string
-    image?: string | null
 }

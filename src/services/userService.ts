@@ -33,10 +33,10 @@ export default class UserService {
 		user.setPassword(Base64Helper.encode(JSON.stringify(encryptedPassword)));
 
 		// Store user
-		const newUser = await this.userData.storeUser(new UserPostgresRepository(), user, profile);
+		const newUser = await this.userData.storeUser(new UserPostgresRepository(), user);
 		if (!newUser) throw new UserCreationFailed();
 
-		if (!await this.userData.storeUser(new UserRedisRepository(), newUser as UserModel, profile)) 
+		if (!await this.userData.storeUser(new UserRedisRepository(), newUser as UserModel)) 
 			throw new UserCreationFailed();
 
 		user.setPassword(plainPassword);

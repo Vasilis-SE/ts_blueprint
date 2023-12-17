@@ -4,7 +4,7 @@ import UserModel from '@models/userModel';
 import UserRepository from '@repositories/userRepository';
 import Logger from '@config/logger';
 import RedisConnector from '@connections/redisConnector';
-import { instanceToPlain } from 'class-transformer';
+import UserMapper from '@helpers/mappers/userMapper';
 
 export default class UserRedisRepository extends UserRepository {
 	getUserById(userid: number): Promise<boolean | IUserDbExtended> {
@@ -17,36 +17,34 @@ export default class UserRedisRepository extends UserRepository {
 		throw new Error('Method not implemented.');
 	}
 
-	public async storeUser(user: UserModel, profile?: ProfileModel | undefined): Promise<boolean | IUserDbExtended> {
-		// Data to database format
-		const userDb: IUserDbExtended = {
-			id: user.getId() as number,
-			username: user.getUsername(),
-			password: user.getPassword(),
-		};
+	public async storeUser(user: UserModel): Promise<IUserDbExtended> {
+		const newUser = UserMapper.fromUserInstanceToUserDb(user);
+		const newProfile = UserMapper.fromProfileInstanceToProfileDb(
+			new ProfileModel({
+				userid: newUser.id,
+				firstName: null,
+				lastName: null,
+				address: null,
+				image: null
+			})
+		);
 
-		if (profile)
-			userDb.profile = {
-				id: profile.getId(),
-				userid: profile.getUserId(),
-				first_name: profile.getFirstName(),
-				last_name: profile.getLastName(),
-				address: profile.getAddress(),
-				image: profile.getImage()
-			};
-		
+		const toChache: IUserDbExtended = { ...newUser, profile: newProfile };
+
 		try {
-			const result = await RedisConnector.redis().set(`${process.env.REDIS_USERS_KEY}:${userDb.id}`, JSON.stringify(userDb));
-			console.log(result);
+			await RedisConnector.redis().hSet(`${process.env.REDIS_USERS_KEY}:${newUser.id}`, { ...newUser });
+			// for (const [key, value] of Object.entries(newUser)) {
+			// 	Logger.debug(`${process.env.REDIS_USERS_KEY}:${newUser.id} | ${key} | ${value}`, __filename)
+			// }
+			await RedisConnector.redis().hSet(`${process.env.REDIS_PROFILES_KEY}:${newUser.id}`, { ...newProfile  } as any);
+
+			// for (const [key, value] of Object.entries(newProfile))
+			// 	await RedisConnector.redis().hSetNX(`${process.env.REDIS_PROFILES_KEY}:${newUser.id}`, key, value as string);
 		} catch (error: any) {
-			Logger.error(`Repository Error on storeUser. Message: ${error.message}`, __filename);
-			return false;
+			Logger.error(`[UserRedisRepository|storeUserAndProfile] - ${error.message}`, __filename);
+			throw error;
 		}
 
-		return userDb;
-	}
-
-	storeProfile(profile: ProfileModel): Promise<boolean | IProfileDb> {
-		throw new Error('Method not implemented.');
+		return toChache;
 	}
 }

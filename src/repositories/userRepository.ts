@@ -1,5 +1,4 @@
-import { IProfileDb, IUserDbExtended } from "@interfaces/userInterfaces";
-import ProfileModel from "@models/profileModel";
+import { IProfileDb, IUserDb, IUserDbExtended } from "@interfaces/userInterfaces";
 import UserModel from "@models/userModel";
 
 export default abstract class UserRepository {
@@ -7,6 +6,5 @@ export default abstract class UserRepository {
 	abstract getUserByUsername(username: string): Promise<IUserDbExtended | boolean>;
 	abstract getUserProfile(userid: number): Promise<IProfileDb | boolean>;
 
-	abstract storeUser(user: UserModel, profile?: ProfileModel): Promise<IUserDbExtended | boolean>;
-	abstract storeProfile(profile: ProfileModel): Promise<IProfileDb | boolean>;
+	abstract storeUser(user: UserModel): Promise<IUserDbExtended>;
 }

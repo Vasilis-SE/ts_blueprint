@@ -1,40 +1,12 @@
 import Logger from '@config/logger';
-import { IProfileDb, IUserDbExtended, IUserDbSearchCriteria } from '@interfaces/userInterfaces';
+import UserMapper from '@helpers/mappers/userMapper';
+import { IProfileDb, IUserDb, IUserDbExtended } from '@interfaces/userInterfaces';
 import ProfileModel from '@models/profileModel';
 import UserModel from '@models/userModel';
 import { PrismaClient } from '@prisma/client';
 import UserRepository from '@repositories/userRepository';
 
 export default class UserPostgresRepository extends UserRepository {
-
-
-	// public async getUser(prismaArgs: ): Promise<boolean | IUserDbExtended> {
-	// 	const prisma = new PrismaClient();
-
-
-	// 	try {
-	// 		const searchedUser: IUserDbExtended | null = await prisma.users.findUnique({
-	// 			where: {
-	// 				id: Number(userid)
-	// 			},
-	// 			include: {
-	// 				profile: true
-	// 			}
-	// 		});
-
-	// 		if (!searchedUser) throw new Error(`Could not find user with given id [${userid}]...`);
-
-	// 		return searchedUser;
-	// 	} catch (error: any) {
-	// 		Logger.error(`Repository Error on getUser. Message: ${error.message}`, __filename);
-	// 		return false;
-	// 	}
-	// }
-
-
-
-
-
 	public async getUserById(userid: number): Promise<boolean | IUserDbExtended> {
 		const prisma = new PrismaClient();
 
@@ -98,58 +70,35 @@ export default class UserPostgresRepository extends UserRepository {
 		}
 	}
 
-	public async storeUser(user: UserModel, userProfile?: ProfileModel): Promise<IUserDbExtended | boolean> {
+	public async storeUser(user: UserModel): Promise<IUserDbExtended> {
 		const prisma = new PrismaClient();
 
 		try {
-			const result = await prisma.$transaction(async prisma => {
-				const prismaUser: IUserDbExtended = await prisma.users.create({
-					data: {
-						username: user.getUsername(),
-						password: user.getPassword()
-					}
+			return await prisma.$transaction(async trnsactionPrisma => {
+				const newUser: any = UserMapper.fromUserInstanceToUserDb(user);
+				delete newUser.id;
+
+				const userDb: IUserDb = await prisma.users.create({
+					data: newUser
 				});
 
-				if (userProfile) {
-					const prismaProfile: IProfileDb = await prisma.profiles.create({
-						data: {
-							userid: prismaUser.id,
-							first_name: userProfile.getFirstName(),
-							last_name: userProfile.getLastName(),
-							address: userProfile.getAddress(),
-							image: userProfile.getImage()
-						}
-					});
+				const profileDb: IProfileDb = await prisma.profiles.create({
+					data: UserMapper.fromProfileInstanceToProfileDb(
+						new ProfileModel({
+							userid: userDb.id,
+							firstName: null,
+							lastName: null,
+							address: null,
+							image: null
+						})
+					)
+				});
 
-					prismaUser.profile = prismaProfile;
-				}
-
-				return prismaUser;
+				return { ...userDb, profile: profileDb } as IUserDbExtended;
 			});
-
-			return result;
 		} catch (error: any) {
-			Logger.error(`Repository Error on storeUser. Message: ${error.message}`, __filename);
-			return false;
-		}
-	}
-
-	public async storeProfile(profile: ProfileModel): Promise<IProfileDb | boolean> {
-		const prisma = new PrismaClient();
-
-		try {
-			return (await prisma.profiles.create({
-				data: {
-					userid: profile.getUserId(),
-					first_name: profile.getFirstName(),
-					last_name: profile.getLastName(),
-					address: profile.getAddress(),
-					image: profile.getImage()
-				}
-			})) as IProfileDb;
-		} catch (error: any) {
-			Logger.error(`Repository Error on storeProfile. Message: ${error.message}`, __filename);
-			return false;
+			Logger.error(`[UserPostgresRepository|storeUserAndProfile] - ${error.message}`, __filename);
+			throw error;
 		}
 	}
 }
